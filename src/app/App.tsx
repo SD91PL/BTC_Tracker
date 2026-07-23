@@ -494,7 +494,7 @@ export default function App() {
 						</button>
 					</div>
 
-					{/* Footer */}
+					{/* Current exchange rate */}
 					<div className='px-6 pb-5 text-center'>
 						<p
 							className='text-xs'
