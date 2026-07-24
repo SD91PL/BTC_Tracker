@@ -38,13 +38,14 @@ function formatPLN(n: number) {
 	}).format(n)
 }
 
-// Formats a raw timestamp into an "HH:mm" label for the chart's X axis —
-// display-level formatting stays here, not in the data-fetching layer
-function formatTime(timestamp: number) {
-	return new Date(timestamp).toLocaleTimeString('en-US', {
+// Formats a raw timestamp into a "dd.MM, HH:mm" label — used as the
+// (hidden) X axis dataKey and shown in the tooltip above the price
+function formatDateTime(timestamp: number) {
+	return new Date(timestamp).toLocaleString('pl-PL', {
+		day: '2-digit',
+		month: '2-digit',
 		hour: '2-digit',
 		minute: '2-digit',
-		hour12: false,
 	})
 }
 
@@ -59,10 +60,12 @@ function sampleEvenly<T>(items: T[], targetPoints: number): T[] {
 const CustomTooltip = ({
 	active,
 	payload,
+	label,
 	currency,
 }: {
 	active?: boolean
 	payload?: { value: number }[]
+	label?: string
 	currency: 'USD' | 'PLN'
 }) => {
 	if (active && payload && payload.length) {
@@ -80,6 +83,11 @@ const CustomTooltip = ({
 					backdropFilter: 'blur(12px)',
 				}}
 				className='px-3 py-2 rounded-lg'>
+				<p
+					style={{ fontFamily: "'DM Mono', monospace" }}
+					className='text-[10px] text-[#6b7280] mb-0.5'>
+					{label}
+				</p>
 				<p
 					style={{ fontFamily: "'DM Mono', monospace" }}
 					className='text-xs text-[#4fffb0]'>
@@ -175,7 +183,7 @@ export default function App() {
 
 	const chartData = canShowChart
 		? chartSeries!.map(d => ({
-				time: formatTime(d.timestamp),
+				time: formatDateTime(d.timestamp),
 				price: currency === 'PLN' ? Math.round(d.price * usdPlnRate!) : d.price,
 			}))
 		: []
