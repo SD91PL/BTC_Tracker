@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from 'react'
 import { colors, monoFont } from '../../theme'
+import { CURRENCY_TOGGLE_DELAY_MS } from '../../constants'
 import { useAppSelector } from '../../store/hooks'
 
 interface PriceDisplayProps {
@@ -16,7 +18,42 @@ export function PriceDisplay({
 	isError,
 	onRetry,
 }: PriceDisplayProps) {
-	const animating = useAppSelector(state => state.currency.animating)
+	const currency = useAppSelector(state => state.currency.currency)
+	const [fading, setFading] = useState(false)
+
+	// Snapshot of what's rendered, decoupled from live props, so the old
+	// price stays visible while dimming instead of swapping instantly.
+	const [rendered, setRendered] = useState({
+		displayPrice,
+		canShowPrice,
+		secondaryLine,
+	})
+
+	const prevCurrency = useRef(currency)
+	const isSwapping = useRef(false)
+
+	// Currency changed: dim, swap to the new value, fade back in.
+	useEffect(() => {
+		if (currency === prevCurrency.current) return
+		prevCurrency.current = currency
+		isSwapping.current = true
+
+		setFading(true)
+		const timer = setTimeout(() => {
+			setRendered({ displayPrice, canShowPrice, secondaryLine })
+			setFading(false)
+			isSwapping.current = false
+		}, CURRENCY_TOGGLE_DELAY_MS)
+
+		return () => clearTimeout(timer)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currency])
+
+	// Regular price refetches (not a currency swap) update immediately.
+	useEffect(() => {
+		if (isSwapping.current) return
+		setRendered({ displayPrice, canShowPrice, secondaryLine })
+	}, [displayPrice, canShowPrice, secondaryLine])
 
 	return (
 		<div className='px-6 py-5 text-center'>
@@ -37,16 +74,21 @@ export function PriceDisplay({
 				}}>
 				<div
 					className='px-6 py-3'
-					style={{ borderRadius: '11px', background: 'rgba(var(--color-mint-rgb), var(--price-panel-fill-alpha))' }}>
+					style={{
+						borderRadius: '11px',
+						background:
+							'rgba(var(--color-mint-rgb), var(--price-panel-fill-alpha))',
+					}}>
 					<p
-						className='text-3xl font-semibold tracking-tight transition-opacity duration-150'
+						className='text-3xl font-semibold tracking-tight'
 						style={{
 							fontFamily: monoFont,
-							color: canShowPrice ? colors.mint : colors.textMuted,
-							opacity: animating ? 0.4 : 1,
+							color: rendered.canShowPrice ? colors.mint : colors.textMuted,
+							opacity: fading ? 0.4 : 1,
+							transition: `opacity ${CURRENCY_TOGGLE_DELAY_MS}ms ease`,
 							letterSpacing: '-0.02em',
 						}}>
-						{displayPrice}
+						{rendered.displayPrice}
 					</p>
 				</div>
 			</div>
@@ -54,7 +96,7 @@ export function PriceDisplay({
 			<p
 				className='text-xs mt-2'
 				style={{ color: colors.textMuted, fontFamily: monoFont }}>
-				{secondaryLine}
+				{rendered.secondaryLine}
 			</p>
 
 			{isError && (
