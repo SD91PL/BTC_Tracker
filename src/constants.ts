@@ -17,3 +17,7 @@ export const BTC_HISTORY_STALE_TIME_MS = 2 * 60_000
 // refetch is more than enough.
 export const USD_PLN_REFETCH_INTERVAL_MS = 60 * 60_000
 export const USD_PLN_STALE_TIME_MS = 30 * 60_000
+
+// How long the price fades out before the currency actually switches —
+// gives the toggle a bit of visual weight instead of an instant jump.
+export const CURRENCY_TOGGLE_DELAY_MS = 150

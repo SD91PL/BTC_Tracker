@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { Currency } from '../types'
+import { useEffect } from 'react'
 import { useBtcTicker } from '../hooks/useBtcTicker'
 import { useCurrencyView } from '../hooks/useCurrencyView'
 import { CardHeader } from './components/CardHeader'
@@ -7,33 +6,30 @@ import { PriceChart } from './components/PriceChart'
 import { PriceDisplay } from './components/PriceDisplay'
 import { CurrencyToggle } from './components/CurrencyToggle'
 import { ExchangeRateFooter } from './components/ExchangeRateFooter'
-
-// How long the price fades out before the currency actually switches —
-// gives the toggle a bit of visual weight instead of an instant jump.
-const CURRENCY_TOGGLE_DELAY_MS = 150
+import { ThemeToggle } from './components/ThemeToggle'
+import { useAppSelector } from '../store/hooks'
 
 export default function App() {
-	const [currency, setCurrency] = useState<Currency>('USD')
-	const [animating, setAnimating] = useState(false)
+	const currency = useAppSelector(state => state.currency.currency)
+	const themeMode = useAppSelector(state => state.theme.mode)
 
 	const ticker = useBtcTicker()
 	const view = useCurrencyView(ticker, currency)
 
-	function handleToggle() {
-		setAnimating(true)
-		setTimeout(() => {
-			setCurrency(c => (c === 'USD' ? 'PLN' : 'USD'))
-			setAnimating(false)
-		}, CURRENCY_TOGGLE_DELAY_MS)
-	}
+	// The actual color values live in theme.css, keyed off this attribute —
+	// this effect is the only thing that ever needs to touch the DOM directly.
+	useEffect(() => {
+		document.documentElement.setAttribute('data-theme', themeMode)
+	}, [themeMode])
 
 	return (
 		<div
-			className='min-h-screen w-full flex items-center justify-center p-4'
+			className='min-h-screen w-full flex flex-col items-center justify-center gap-6 p-4'
 			style={{
 				background:
-					'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,255,176,0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 100%, rgba(99,102,241,0.08) 0%, transparent 55%), #080b14',
+					'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--color-mint-rgb), 0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 100%, rgba(var(--color-indigo-rgb), 0.08) 0%, transparent 55%), rgb(var(--color-bg-rgb))',
 				fontFamily: "'Outfit', sans-serif",
+				transition: 'background 0.4s ease',
 			}}>
 			{/* Outer gradient border wrapper */}
 			<div
@@ -42,14 +38,14 @@ export default function App() {
 					borderRadius: '20px',
 					padding: '1px',
 					background:
-						'linear-gradient(135deg, rgba(79,255,176,0.5) 0%, rgba(99,102,241,0.2) 40%, rgba(79,255,176,0.1) 100%)',
+						'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.5) 0%, rgba(var(--color-indigo-rgb), 0.2) 40%, rgba(var(--color-mint-rgb), 0.1) 100%)',
 				}}>
 				{/* Glass card */}
 				<div
 					className='relative w-full flex flex-col overflow-hidden'
 					style={{
 						borderRadius: '19px',
-						background: 'rgba(10, 13, 24, 0.75)',
+						background: 'rgba(var(--color-bg-elevated-rgb), 0.75)',
 						backdropFilter: 'blur(24px)',
 						WebkitBackdropFilter: 'blur(24px)',
 					}}>
@@ -62,14 +58,12 @@ export default function App() {
 					<PriceChart
 						chartData={view.chartData}
 						canShowChart={view.canShowChart}
-						currency={currency}
 					/>
 
 					<PriceDisplay
 						displayPrice={view.displayPrice}
 						canShowPrice={view.canShowPrice}
 						secondaryLine={view.secondaryLine}
-						animating={animating}
 						isError={ticker.isError}
 						onRetry={ticker.refetchAll}
 					/>
@@ -79,14 +73,11 @@ export default function App() {
 						className='mx-6 h-px'
 						style={{
 							background:
-								'linear-gradient(90deg, transparent, rgba(79,255,176,0.2), transparent)',
+								'linear-gradient(90deg, transparent, rgba(var(--color-mint-rgb), 0.2), transparent)',
 						}}
 					/>
 
-					<CurrencyToggle
-						currency={currency}
-						onToggle={handleToggle}
-					/>
+					<CurrencyToggle />
 
 					<ExchangeRateFooter
 						hasRate={ticker.hasRate}
@@ -94,6 +85,8 @@ export default function App() {
 					/>
 				</div>
 			</div>
+
+			<ThemeToggle />
 		</div>
 	)
 }

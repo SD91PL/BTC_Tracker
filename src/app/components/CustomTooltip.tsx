@@ -1,20 +1,16 @@
-import type { Currency } from '../../types'
 import { formatCurrency } from '../../utils/currency'
 import { colors, monoFont } from '../../theme'
+import { useAppSelector } from '../../store/hooks'
 
 interface CustomTooltipProps {
 	active?: boolean
 	payload?: { value: number }[]
 	label?: string
-	currency: Currency
 }
 
-export function CustomTooltip({
-	active,
-	payload,
-	label,
-	currency,
-}: CustomTooltipProps) {
+export function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+	const currency = useAppSelector(state => state.currency.currency)
+
 	if (!active || !payload || !payload.length) return null
 
 	// payload values are already converted to the selected currency
@@ -24,8 +20,8 @@ export function CustomTooltip({
 	return (
 		<div
 			style={{
-				background: 'rgba(8, 11, 20, 0.85)',
-				border: '1px solid rgba(247, 147, 26, 0.3)',
+				background: 'rgba(var(--color-bg-rgb), 0.85)',
+				border: '1px solid rgba(var(--color-bitcoin-rgb), 0.3)',
 				backdropFilter: 'blur(12px)',
 			}}
 			className='px-3 py-2 rounded-lg'>

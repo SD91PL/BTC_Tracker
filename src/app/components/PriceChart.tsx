@@ -6,7 +6,6 @@ import {
 	Tooltip,
 	ResponsiveContainer,
 } from 'recharts'
-import type { Currency } from '../../types'
 import type { ChartPoint } from '../../hooks/useCurrencyView'
 import { CustomTooltip } from './CustomTooltip'
 import { colors, monoFont } from '../../theme'
@@ -15,14 +14,9 @@ import { NA } from '../../constants'
 interface PriceChartProps {
 	chartData: ChartPoint[]
 	canShowChart: boolean
-	currency: Currency
 }
 
-export function PriceChart({
-	chartData,
-	canShowChart,
-	currency,
-}: PriceChartProps) {
+export function PriceChart({ chartData, canShowChart }: PriceChartProps) {
 	return (
 		<div className='w-full h-40 px-0 relative'>
 			{!canShowChart && (
@@ -68,9 +62,9 @@ export function PriceChart({
 						hide
 					/>
 					<Tooltip
-						content={<CustomTooltip currency={currency} />}
+						content={<CustomTooltip />}
 						cursor={{
-							stroke: 'rgba(79,255,176,0.3)',
+							stroke: 'rgba(var(--color-mint-rgb), 0.3)',
 							strokeWidth: 1,
 							strokeDasharray: '4 4',
 						}}

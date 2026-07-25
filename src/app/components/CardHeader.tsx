@@ -19,7 +19,7 @@ export function CardHeader({
 					className='w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold'
 					style={{
 						background: `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`,
-						color: colors.bg,
+						color: 'rgb(var(--color-on-mint-rgb))',
 						fontFamily: monoFont,
 					}}>
 					₿

@@ -1,64 +1,147 @@
-import type { Currency } from '../../types'
+import { useRef, useState } from 'react'
 import { colors, monoFont } from '../../theme'
+import { CURRENCY_TOGGLE_DELAY_MS } from '../../constants'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import {
+	toggleStarted,
+	toggleCommitted,
+} from '../../store/slices/currencySlice'
 
-interface CurrencyToggleProps {
-	currency: Currency
-	onToggle: () => void
-}
+export function CurrencyToggle() {
+	const dispatch = useAppDispatch()
+	const currency = useAppSelector(state => state.currency.currency)
 
-export function CurrencyToggle({ currency, onToggle }: CurrencyToggleProps) {
+	const [displayCurrency, setDisplayCurrency] = useState(currency)
+
+	const [iconRotation, setIconRotation] = useState(0)
+	const [isAnimating, setIsAnimating] = useState(false)
+
+	const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	function handleToggle() {
+		const next = displayCurrency === 'USD' ? 'PLN' : 'USD'
+
+		setDisplayCurrency(next)
+
+		if (resetTimer.current) {
+			clearTimeout(resetTimer.current)
+		}
+
+		setIsAnimating(true)
+		setIconRotation(180)
+
+		resetTimer.current = setTimeout(() => {
+			setIsAnimating(false)
+			setIconRotation(0)
+		}, 350)
+
+		dispatch(toggleStarted())
+
+		setTimeout(() => {
+			dispatch(toggleCommitted())
+		}, CURRENCY_TOGGLE_DELAY_MS)
+	}
+
 	return (
 		<div className='px-6 py-5'>
 			<button
-				onClick={onToggle}
-				className='w-full relative group cursor-pointer'
-				style={{
-					borderRadius: '12px',
-					padding: '1px',
-					background:
-						currency === 'USD'
-							? 'linear-gradient(135deg, rgba(79,255,176,0.6), rgba(251,191,36,0.2))'
-							: 'linear-gradient(135deg, rgba(99,102,241,0.6), rgba(139,92,246,0.2))',
-					transition: 'background 0.4s ease',
-				}}>
+				onClick={handleToggle}
+				className='relative w-full overflow-hidden cursor-pointer'
+				style={{ borderRadius: 12 }}>
+				{/* USD gradient */}
 				<div
-					className='w-full flex items-center justify-between px-5 py-3.5 transition-colors duration-300'
+					className='absolute inset-0'
 					style={{
-						borderRadius: '11px',
-						background: 'rgba(8, 11, 20, 0.6)',
+						borderRadius: 12,
+						background:
+							'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.6), rgba(var(--color-amber-rgb), 0.2))',
+						opacity: displayCurrency === 'USD' ? 1 : 0,
+						transition: 'opacity .4s ease',
+					}}
+				/>
+
+				{/* PLN gradient */}
+				<div
+					className='absolute inset-0'
+					style={{
+						borderRadius: 12,
+						background:
+							'linear-gradient(135deg, rgba(var(--color-indigo-rgb), 0.6), rgba(var(--color-violet-rgb), 0.2))',
+						opacity: displayCurrency === 'PLN' ? 1 : 0,
+						transition: 'opacity .4s ease',
+					}}
+				/>
+
+				{/* Inner panel */}
+				<div
+					className='absolute inset-px'
+					style={{
+						borderRadius: 11,
+						background: 'rgba(var(--color-bg-rgb), 0.6)',
 						backdropFilter: 'blur(8px)',
-					}}>
-					{/* USD pill */}
+						WebkitBackdropFilter: 'blur(8px)',
+					}}
+				/>
+
+				{/* Content */}
+				<div className='relative flex items-center justify-between px-5 py-3.5'>
+					{/* USD */}
 					<div className='flex items-center gap-2'>
-						<div
-							className='w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300'
-							style={{
-								background:
-									currency === 'USD'
-										? `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`
-										: 'rgba(255,255,255,0.08)',
-								color: currency === 'USD' ? colors.bg : colors.textMuted,
-								fontFamily: monoFont,
-							}}>
-							$
+						<div className='relative w-6 h-6 rounded-full overflow-hidden'>
+							<div
+								className='absolute inset-0'
+								style={{
+									background: 'rgba(var(--color-surface-rgb), 0.08)',
+									opacity: displayCurrency === 'USD' ? 0 : 1,
+									transition: 'opacity .3s ease',
+								}}
+							/>
+
+							<div
+								className='absolute inset-0'
+								style={{
+									background: `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`,
+									opacity: displayCurrency === 'USD' ? 1 : 0,
+									transition: 'opacity .3s ease',
+								}}
+							/>
+
+							<span
+								className='relative flex items-center justify-center w-full h-full text-xs font-bold'
+								style={{
+									color:
+										displayCurrency === 'USD'
+											? 'rgb(var(--color-on-mint-rgb))'
+											: colors.textMuted,
+									fontFamily: monoFont,
+								}}>
+								$
+							</span>
 						</div>
+
 						<span
 							className='text-sm font-medium transition-colors duration-300'
 							style={{
-								color: currency === 'USD' ? colors.mint : colors.textMuted,
+								color:
+									displayCurrency === 'USD' ? colors.mint : colors.textMuted,
 								fontFamily: monoFont,
 							}}>
 							USD
 						</span>
 					</div>
 
-					{/* Swap icon */}
+					{/* Icon */}
 					<svg
 						width='16'
 						height='16'
 						viewBox='0 0 16 16'
 						fill='none'
-						style={{ color: colors.textMuted }}>
+						style={{
+							color: colors.textMuted,
+							transform: `rotate(${iconRotation}deg)`,
+							transformOrigin: 'center',
+							transition: isAnimating ? 'transform 350ms ease' : 'none',
+						}}>
 						<path
 							d='M3 5l3-3 3 3M6 2v8M13 11l-3 3-3-3M10 14V6'
 							stroke='currentColor'
@@ -68,28 +151,50 @@ export function CurrencyToggle({ currency, onToggle }: CurrencyToggleProps) {
 						/>
 					</svg>
 
-					{/* PLN pill */}
+					{/* PLN */}
 					<div className='flex items-center gap-2'>
 						<span
 							className='text-sm font-medium transition-colors duration-300'
 							style={{
 								color:
-									currency === 'PLN' ? colors.indigoLight : colors.textMuted,
+									displayCurrency === 'PLN'
+										? colors.indigoLight
+										: colors.textMuted,
 								fontFamily: monoFont,
 							}}>
 							PLN
 						</span>
-						<div
-							className='w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300'
-							style={{
-								background:
-									currency === 'PLN'
-										? `linear-gradient(135deg, ${colors.indigo}, ${colors.indigoLight})`
-										: 'rgba(255,255,255,0.08)',
-								color: currency === 'PLN' ? '#ffffff' : colors.textMuted,
-								fontFamily: monoFont,
-							}}>
-							zł
+
+						<div className='relative w-6 h-6 rounded-full overflow-hidden'>
+							<div
+								className='absolute inset-0'
+								style={{
+									background: 'rgba(var(--color-surface-rgb), 0.08)',
+									opacity: displayCurrency === 'PLN' ? 0 : 1,
+									transition: 'opacity .3s ease',
+								}}
+							/>
+
+							<div
+								className='absolute inset-0'
+								style={{
+									background: `linear-gradient(135deg, ${colors.indigo}, ${colors.indigoLight})`,
+									opacity: displayCurrency === 'PLN' ? 1 : 0,
+									transition: 'opacity .3s ease',
+								}}
+							/>
+
+							<span
+								className='relative flex items-center justify-center w-full h-full text-xs font-bold'
+								style={{
+									color:
+										displayCurrency === 'PLN'
+											? 'rgb(var(--color-on-accent-rgb))'
+											: colors.textMuted,
+									fontFamily: monoFont,
+								}}>
+								zł
+							</span>
 						</div>
 					</div>
 				</div>

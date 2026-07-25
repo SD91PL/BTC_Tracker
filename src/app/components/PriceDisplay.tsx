@@ -1,10 +1,10 @@
 import { colors, monoFont } from '../../theme'
+import { useAppSelector } from '../../store/hooks'
 
 interface PriceDisplayProps {
 	displayPrice: string
 	canShowPrice: boolean
 	secondaryLine: string
-	animating: boolean
 	isError: boolean
 	onRetry: () => void
 }
@@ -13,10 +13,11 @@ export function PriceDisplay({
 	displayPrice,
 	canShowPrice,
 	secondaryLine,
-	animating,
 	isError,
 	onRetry,
 }: PriceDisplayProps) {
+	const animating = useAppSelector(state => state.currency.animating)
+
 	return (
 		<div className='px-6 py-5 text-center'>
 			<p
@@ -32,11 +33,11 @@ export function PriceDisplay({
 					borderRadius: '12px',
 					padding: '1px',
 					background:
-						'linear-gradient(135deg, rgba(79,255,176,0.4), rgba(99,102,241,0.15), rgba(79,255,176,0.1))',
+						'linear-gradient(135deg, rgba(var(--color-mint-rgb), var(--price-panel-border-alpha-1)), rgba(var(--color-indigo-rgb), var(--price-panel-border-alpha-2)), rgba(var(--color-mint-rgb), var(--price-panel-border-alpha-3)))',
 				}}>
 				<div
 					className='px-6 py-3'
-					style={{ borderRadius: '11px', background: 'rgba(79,255,176,0.06)' }}>
+					style={{ borderRadius: '11px', background: 'rgba(var(--color-mint-rgb), var(--price-panel-fill-alpha))' }}>
 					<p
 						className='text-3xl font-semibold tracking-tight transition-opacity duration-150'
 						style={{

@@ -31,8 +31,8 @@ export function ExchangeRateFooter({
 							opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap z-10'>
 						<div
 							style={{
-								background: 'rgba(8, 11, 20, 0.9)',
-								border: '1px solid rgba(247, 147, 26, 0.3)',
+								background: 'rgba(var(--color-bg-rgb), 0.9)',
+								border: '1px solid rgba(var(--color-bitcoin-rgb), 0.3)',
 								backdropFilter: 'blur(12px)',
 							}}
 							className='px-3 py-1.5 rounded-lg'>
