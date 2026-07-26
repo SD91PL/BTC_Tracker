@@ -42,13 +42,15 @@ The application uses external APIs to provide up-to-date market information:
 
 ## 🛠️ Tech Stack
 
-- React 18
+- React
 - TypeScript
-- Vite 6
-- Tailwind CSS 4
-- TanStack Query 5
-- Redux Toolkit 2
-- Recharts 2
+- Vite
+- Tailwind CSS
+- TanStack Query
+- Redux Toolkit
+- Recharts
+
+> See `package.json` for exact dependency versions.
 
 ## 🗂️ Project Structure
 
@@ -82,8 +84,6 @@ The project is split into two layers:
 The app supports light and dark themes, toggled via the switch beneath the card. Theme state lives in the Redux `theme` slice; `App.tsx` syncs it to a `data-theme` attribute on `<html>`, which drives all colors.
 
 All colors are defined as CSS custom properties in `src/styles/theme.css` (dark is the default/fallback). `src/theme.ts` re-exports the solid tokens as `var(--color-…)` strings for use in inline styles, so they stay reactive to theme changes.
-
-Dark theme uses a mint-green accent; light theme uses a warm Bitcoin-inspired orange/brown accent. Status colors (price up/down) are also adjusted per theme for better contrast.
 
 ## 📦 Installation
 
