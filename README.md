@@ -39,13 +39,12 @@ The application uses external APIs to provide up-to-date market information:
 
 ## 🛠️ Tech Stack
 
-- React 18 + TypeScript
+- React
 - Vite
-- Tailwind CSS v4
+- Tailwind CSS
 - TanStack Query
-- Redux Toolkit + react-redux
+- Redux Toolkit
 - Recharts
-- tw-animate-css
 
 ## 🗂️ Project Structure
 
