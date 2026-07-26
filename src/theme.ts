@@ -2,7 +2,6 @@
 // so inline styles stay reactive to light/dark theme changes.
 
 export const colors = {
-	bg: 'var(--color-bg)',
 	mint: 'var(--color-mint)',
 	mintDark: 'var(--color-mint-dark)',
 	indigo: 'var(--color-indigo)',
@@ -15,4 +14,3 @@ export const colors = {
 } as const
 
 export const monoFont = "'DM Mono', monospace"
-export const displayFont = "'Outfit', sans-serif"
