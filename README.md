@@ -25,8 +25,9 @@ The application was created based on a design concept developed in **Figma Make*
 Original Figma design:  
 https://www.figma.com/design/WWARD6rz7UywY2sgwmrd7U/Minimalist-BTC-Price-Tracker
 
-The design was then implemented as a functional React application with live market data integration.
-The interface was designed as a minimalist, glass-inspired card experience with custom theme tokens and animated transitions. The visual system is driven by CSS variables so the app can switch between dark and light modes without changing component logic.
+> The design was then implemented as a functional React application with live market data integration.
+> The interface was designed as a minimalist, glass-inspired card experience with custom theme tokens and animated transitions.
+> The visual system is driven by CSS variables so the app can switch between dark and light modes without changing component logic.
 
 ## 🔌 Data Sources
 
