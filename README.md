@@ -1,6 +1,6 @@
 # Minimalist BTC Price Tracker
 
-A simple React application for tracking the current Bitcoin price with interactive charts and a responsive interface.
+A modern React + Vite dashboard for monitoring Bitcoin price movements in real time. The app combines live market data, a polished glassmorphism UI, and smooth theme/currency transitions in a compact single-screen experience.
 
 ## 🔗 Live Demo
 
@@ -8,13 +8,15 @@ https://sd91pl.github.io/BTC_Tracker/
 
 ## ✨ Features
 
-- Live Bitcoin price (refreshed every 30 seconds)
-- Interactive 24h price chart
-- Responsive UI
+- Live BTC price with automatic refresh
+- 24-hour price change indicator
+- Interactive 24h chart rendered with Recharts
+- Currency switching between USD and PLN with fade animation
+- Light/dark theme toggle with animated UI
+- Responsive UI optimized for desktop and mobile
 - Data fetching & caching with TanStack Query
-- BTC price displayed in USD and PLN
-- Animated light/dark theme toggle
-- Currency toggle with fade animation
+- Fallback to N/A when external data is unavailable
+- Manual retry on API errors
 
 ## 🎨 Design
 
@@ -24,6 +26,7 @@ Original Figma design:
 https://www.figma.com/design/WWARD6rz7UywY2sgwmrd7U/Minimalist-BTC-Price-Tracker
 
 The design was then implemented as a functional React application with live market data integration.
+The interface was designed as a minimalist, glass-inspired card experience with custom theme tokens and animated transitions. The visual system is driven by CSS variables so the app can switch between dark and light modes without changing component logic.
 
 ## 🔌 Data Sources
 
@@ -39,39 +42,42 @@ The application uses external APIs to provide up-to-date market information:
 
 ## 🛠️ Tech Stack
 
-- React
-- Vite
-- Tailwind CSS
-- TanStack Query
-- Redux Toolkit
-- Recharts
+- React 18
+- TypeScript
+- Vite 6
+- Tailwind CSS 4
+- TanStack Query 5
+- Redux Toolkit 2
+- Recharts 2
 
 ## 🗂️ Project Structure
 
 ```
 src/
-├── api/          # External API calls (CoinGecko, exchange rate)
-├── app/          # App shell and UI components
-│   └── components/
-├── hooks/        # Data-fetching and derived-view hooks (TanStack Query)
-├── store/        # Redux Toolkit store (client-side UI state)
-│   ├── slices/   # currency + theme slices
-│   ├── hooks.ts  # Typed useAppDispatch / useAppSelector
-│   └── index.ts  # Store configuration
-├── styles/       # Global CSS + theme tokens (theme.css)
-├── utils/        # Formatting helpers (currency, date/time, arrays)
-├── constants.ts  # Shared app-wide constants (refetch intervals, etc.)
-├── theme.ts      # CSS variable re-exports for inline styles
-├── types.ts      # Shared TypeScript types
-└── main.tsx
+├── api/                # External API calls (CoinGecko, exchange rate)
+├── app/                # App shell
+│   └── components/     # UI components
+├── hooks/              # Data-fetching and derived-view hooks (TanStack Query)
+├── store/              # Redux Toolkit store (client-side UI state)
+│   ├── slices/         # currency + theme slices
+│   ├── hooks.ts        # Typed useAppDispatch / useAppSelector
+│   └── index.ts        # Store configuration
+├── styles/             # Global CSS + theme tokens (theme.css)
+├── utils/              # Formatting helpers (currency, date/time, arrays)
+├── constants.ts        # Shared app-wide constants (refetch intervals, etc.)
+├── theme.ts            # CSS variable re-exports for inline styles
+├── types.ts            # Shared TypeScript types
+└── main.tsx            # Application entry point
 ```
 
-State is split by kind:
+## 🧠 State Management
+
+The project is split into two layers:
 
 - **Server data** (BTC price, 24h history, USD/PLN rate) is fetched and cached via **TanStack Query** in `hooks/`.
 - **Client-side UI state** (selected currency + toggle animation, light/dark theme) lives in the **Redux Toolkit** store under `store/`.
 
-## 🎨 Theming
+## 🌗 Theming
 
 The app supports light and dark themes, toggled via the switch beneath the card. Theme state lives in the Redux `theme` slice; `App.tsx` syncs it to a `data-theme` attribute on `<html>`, which drives all colors.
 
