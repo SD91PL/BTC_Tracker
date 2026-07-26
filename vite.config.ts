@@ -20,18 +20,16 @@ export default defineConfig({
 
 	plugins: [
 		figmaAssetResolver(),
-		// The React and Tailwind plugins are both required for Make, even if
-		// Tailwind is not being actively used – do not remove them
+		// Required for Make — do not remove.
 		react(),
 		tailwindcss(),
 	],
 	resolve: {
 		alias: {
-			// Alias @ to the src directory
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
 
-	// File types to support raw imports. Never add .css, .tsx, or .ts files to this.
+	// Raw import support (do not include .css/.ts/.tsx).
 	assetsInclude: ['**/*.svg', '**/*.csv'],
 })

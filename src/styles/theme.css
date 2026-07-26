@@ -1,27 +1,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * App-specific design tokens — solid colors AND their "R, G, B" triplet
- * counterparts (for alpha compositing via rgba(var(--color-x-rgb), 0.5) in
- * inline gradients/overlays throughout src/app/).
- *
- * Defined per theme via the `data-theme` attribute set on <html> by
- * ThemeToggle/App (state lives in the Redux `theme` slice — see
- * src/store/slices/themeSlice.ts). Dark is the default/fallback so the app
- * looks right even before the toggle's sync effect runs on first paint.
- *
- * src/theme.ts re-exports the solid tokens as `var(--color-x)` strings for
- * use in JS/inline styles, so this file is the single source of truth for
- * every color in the app — component code never hardcodes a hex/rgba value.
+ * Design tokens (solid + RGB triplets for rgba() compositing).
+ * Themed via data-theme on <html>; dark is the default/fallback.
+ * src/theme.ts re-exports solid tokens as var() for inline styles.
  */
 :root,
 [data-theme='dark'] {
 	/* Surfaces */
 	--color-bg: #080b14;
 	--color-bg-rgb: 8, 11, 20;
-	--color-bg-elevated-rgb: 10, 13, 24; /* glass card / tooltip background */
-	--color-surface-rgb:
-		255, 255, 255; /* subtle overlay tint on top of surfaces */
+	--color-bg-elevated-rgb: 10, 13, 24; /* glass card / tooltip */
+	--color-surface-rgb: 255, 255, 255; /* surface overlay tint */
 
 	/* Text */
 	--color-text-primary: #e8eaf2;
@@ -43,26 +33,17 @@
 	--color-negative: #ef4444;
 
 	/* One-off accents */
-	--color-amber-rgb: 251, 191, 36; /* USD toggle accent */
-	--color-violet-rgb: 139, 92, 246; /* PLN toggle accent */
-	--color-bitcoin-rgb: 247, 147, 26; /* tooltip border accent */
+	--color-amber-rgb: 251, 191, 36; /* USD toggle */
+	--color-violet-rgb: 139, 92, 246; /* PLN toggle */
+	--color-bitcoin-rgb: 247, 147, 26; /* tooltip border */
 
-	/* Text sitting on top of a saturated accent-colored fill (e.g. the active
-     PLN pill icon) — always white/light regardless of theme, unlike
-     --color-surface-rgb which intentionally flips. */
+	/* Text on saturated accent fills — always light. */
 	--color-on-accent-rgb: 255, 255, 255;
 
-	/* Text sitting on top of the mint/orange accent fill (BTC badge, active
-     USD pill icon, sun icon in the theme toggle thumb). This flips per
-     theme rather than staying constant like --color-on-accent-rgb: dark
-     theme's mint is bright green so it needs dark ink, but light theme's
-     mint is a darker orange (tuned for text contrast, see below) so it
-     needs near-white text instead. */
+	/* Text on mint/orange fills — flips per theme for contrast. */
 	--color-on-mint-rgb: 8, 11, 20;
 
-	/* Alpha values for the Current Price panel's gradient border/fill (see
-     PriceDisplay.tsx). Themed separately because the fill's tint reads
-     very differently against a near-black vs. a near-white card. */
+	/* Price panel border/fill alphas (tuned per theme contrast). */
 	--price-panel-border-alpha-1: 0.4;
 	--price-panel-border-alpha-2: 0.15;
 	--price-panel-border-alpha-3: 0.1;
@@ -74,10 +55,8 @@
 	--color-bg: #f7f4ef;
 	--color-bg-rgb: 247, 244, 239;
 
-	/* zamiast czystej bieli */
 	--color-bg-elevated-rgb: 252, 249, 245;
 
-	/* trochę cieplejszy overlay */
 	--color-surface-rgb: 42, 36, 31;
 
 	/* Text */
@@ -247,10 +226,7 @@
 		@apply bg-background text-foreground;
 	}
 
-	/**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
+	/* Base typography — overridden by Tailwind utilities. */
 
 	html {
 		font-size: var(--font-size);
@@ -299,8 +275,7 @@
 	}
 }
 
-/* Small "pop" played on the ThemeToggle thumb icon each time the theme
-   switches (the icon element is remounted via a `key={mode}` change). */
+/* ThemeToggle thumb icon pop on switch (remounted via key={mode}). */
 @keyframes theme-toggle-pop {
 	0% {
 		transform: scale(0.5) rotate(-90deg);

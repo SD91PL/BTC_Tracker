@@ -1,8 +1,5 @@
-// Design tokens used across the card. The actual color values live in
-// src/styles/theme.css (as CSS custom properties, themed per data-theme
-// attribute) — this file just re-exports them as `var(--x)` strings so
-// components can keep using `colors.mint` etc. in inline styles, while
-// still reacting correctly when the light/dark theme changes.
+// Re-exports CSS custom properties from theme.css as var() strings
+// so inline styles stay reactive to light/dark theme changes.
 
 export const colors = {
 	bg: 'var(--color-bg)',

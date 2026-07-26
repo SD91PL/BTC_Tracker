@@ -1,9 +1,7 @@
 import { colors, monoFont } from '../../theme'
 import { NA } from '../../constants'
 
-// Decimal places shown in the header rate vs. the precise tooltip on hover.
-// The header is rounded for readability; the tooltip exists precisely so
-// that rounding error doesn't look like a bug when someone checks the math.
+// Header shows 2 decimals; tooltip shows full precision on hover.
 const DISPLAY_DECIMALS = 2
 const PRECISE_DECIMALS = 6
 

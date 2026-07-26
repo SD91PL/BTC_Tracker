@@ -13,8 +13,7 @@ export function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
 	if (!active || !payload || !payload.length) return null
 
-	// payload values are already converted to the selected currency
-	// by useCurrencyView — no conversion needed here
+	// Values already converted by useCurrencyView.
 	const value = formatCurrency(payload[0].value, currency)
 
 	return (

@@ -6,10 +6,7 @@ export interface ThemeState {
 	mode: ThemeMode
 }
 
-// Dark is the app's original/default look, so it stays the initial state —
-// this also has to match the CSS fallback in theme.css (:root, with no
-// data-theme attribute set yet) so there's no flash of the wrong theme
-// before the sync effect in App.tsx runs on first paint.
+// Dark is the default; matches CSS fallback in theme.css to avoid FOUC.
 const initialState: ThemeState = {
 	mode: 'dark',
 }

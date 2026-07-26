@@ -3,24 +3,30 @@ import type { Currency } from '../../types'
 
 export interface CurrencyState {
 	currency: Currency
+	animating: boolean
 }
 
 const initialState: CurrencyState = {
 	currency: 'USD',
+	animating: false,
 }
 
+// Two-step toggle: fade starts immediately, currency flips after delay
+// (CURRENCY_TOGGLE_DELAY_MS). toggleCommitted reads current store value
+// to avoid stale-closure races on rapid clicks.
 const currencySlice = createSlice({
 	name: 'currency',
 	initialState,
 	reducers: {
-		// Flips based on whatever the currency currently is in the store
-		// (rather than a value passed in from the component) so rapid
-		// toggles can't race against a stale closure value.
-		currencyToggled(state) {
+		toggleStarted(state) {
+			state.animating = true
+		},
+		toggleCommitted(state) {
 			state.currency = state.currency === 'USD' ? 'PLN' : 'USD'
+			state.animating = false
 		},
 	},
 })
 
-export const { currencyToggled } = currencySlice.actions
+export const { toggleStarted, toggleCommitted } = currencySlice.actions
 export default currencySlice.reducer

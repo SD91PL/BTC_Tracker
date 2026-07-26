@@ -2,8 +2,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { themeToggled } from '../../store/slices/themeSlice'
 import { colors } from '../../theme'
 
-// Track/thumb geometry, kept in one place so the thumb's sliding
-// position math stays in sync with the track's own dimensions.
+// Track/thumb geometry (kept together so slide math stays in sync).
 const TRACK_WIDTH = 72
 const TRACK_HEIGHT = 36
 const THUMB_SIZE = 28
@@ -94,9 +93,7 @@ export function ThemeToggle() {
 						style={{
 							width: THUMB_SIZE - 10,
 							height: THUMB_SIZE - 10,
-							// The moon sits on indigo (needs constant on-accent white);
-							// the sun sits on mint/orange, whose contrasting text
-							// color flips per theme (dark ink vs. near-white).
+							// Moon: on-accent white; sun: on-mint (flips per theme).
 							color: isDark
 								? 'rgb(var(--color-on-accent-rgb))'
 								: 'rgb(var(--color-on-mint-rgb))',

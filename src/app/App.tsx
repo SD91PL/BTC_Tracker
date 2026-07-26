@@ -16,8 +16,7 @@ export default function App() {
 	const ticker = useBtcTicker()
 	const view = useCurrencyView(ticker, currency)
 
-	// The actual color values live in theme.css, keyed off this attribute —
-	// this effect is the only thing that ever needs to touch the DOM directly.
+	// Sync theme to data-theme attribute (colors live in theme.css).
 	useEffect(() => {
 		document.documentElement.setAttribute('data-theme', themeMode)
 	}, [themeMode])
@@ -31,7 +30,7 @@ export default function App() {
 				fontFamily: "'Outfit', sans-serif",
 				transition: 'background 0.4s ease',
 			}}>
-			{/* Outer gradient border wrapper */}
+			{/* Gradient border */}
 			<div
 				className='relative w-full max-w-sm'
 				style={{

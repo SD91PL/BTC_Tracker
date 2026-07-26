@@ -30,10 +30,8 @@ export interface BtcTicker {
 	refetchAll: () => void
 }
 
-// Fetches and combines the three data sources the ticker needs: current
-// price, 24h history (for the chart), and the USD/PLN exchange rate.
-// Currency-specific formatting/derivation happens in useCurrencyView, not here —
-// this hook only ever deals in raw USD values.
+// Fetches current price, 24h history, and USD/PLN rate (all in raw USD).
+// Currency formatting is handled by useCurrencyView.
 export function useBtcTicker(): BtcTicker {
 	const {
 		data: btcPriceData,
@@ -69,8 +67,7 @@ export function useBtcTicker(): BtcTicker {
 		staleTime: USD_PLN_STALE_TIME_MS,
 	})
 
-	// No fallback numbers — each value is either the real fetched data, or null.
-	// Anywhere null shows up in the UI it's rendered as "N/A", never a guessed number.
+	// Null means unavailable — UI shows "N/A", never a guessed value.
 	const priceUSD = btcPriceData?.price ?? null
 	const change24hRaw = btcPriceData?.change24h ?? null
 	const usdPlnRate = usdPlnRateData ?? null
@@ -84,9 +81,7 @@ export function useBtcTicker(): BtcTicker {
 	const change24h = hasChange ? change24hRaw.toFixed(2) : null
 	const isPositive = hasChange && change24hRaw >= 0
 
-	// The history and the current-price queries are fetched separately, so
-	// they can be a few seconds apart. Force the chart's last point to match
-	// the actual current price so the two never visibly disagree.
+	// Align chart's last point with current price (queries can be slightly out of sync).
 	const chartSeries = hasHistory
 		? hasBtc
 			? [

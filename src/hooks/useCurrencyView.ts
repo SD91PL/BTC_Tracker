@@ -18,9 +18,7 @@ export interface CurrencyView {
 	chartData: ChartPoint[]
 }
 
-// Derives everything the UI needs that depends on which currency (USD/PLN)
-// is currently selected. Kept separate from useBtcTicker so the raw data
-// fetching stays currency-agnostic and easy to reason about on its own.
+// Derives currency-dependent UI values from raw ticker data.
 export function useCurrencyView(
 	ticker: BtcTicker,
 	currency: Currency,
@@ -31,7 +29,7 @@ export function useCurrencyView(
 	const pricePLN =
 		hasBtc && hasRate ? Math.round(priceUSD! * usdPlnRate!) : null
 
-	// PLN view additionally needs the exchange rate, USD view only needs the price itself
+	// PLN needs the exchange rate; USD only needs the price.
 	const canShowPrice = currency === 'USD' ? hasBtc : hasBtc && hasRate
 	const displayPrice = canShowPrice
 		? formatCurrency(currency === 'USD' ? priceUSD! : pricePLN!, currency)
@@ -42,7 +40,7 @@ export function useCurrencyView(
 			? `≈ ${pricePLN != null ? formatPLN(pricePLN) : NA}`
 			: `≈ ${hasBtc ? formatUSD(priceUSD!) : NA}`
 
-	// PLN view of the chart additionally needs the exchange rate
+	// PLN chart also needs the exchange rate.
 	const canShowChart = hasHistory && (currency === 'USD' || hasRate)
 
 	const chartData: ChartPoint[] = canShowChart

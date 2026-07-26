@@ -18,9 +18,7 @@ export function formatPLN(n: number): string {
 	}).format(n)
 }
 
-// Single entry point for "format this number as whichever currency is
-// currently selected" — avoids currency === 'PLN' ? formatPLN : formatUSD
-// being repeated at every call site.
+// Format a number in the currently selected currency.
 export function formatCurrency(n: number, currency: Currency): string {
 	return currency === 'PLN' ? formatPLN(n) : formatUSD(n)
 }

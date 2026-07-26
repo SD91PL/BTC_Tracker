@@ -8,8 +8,7 @@ export interface BtcPricePoint {
 	price: number
 }
 
-// Fetches the current BTC price
-// Real 24h % change comes from CoinGecko directly, not calculated by us
+// Current BTC price; 24h change comes from CoinGecko.
 export async function fetchBtcPrice(): Promise<BtcPriceData> {
 	const res = await fetch(
 		'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
@@ -22,8 +21,7 @@ export async function fetchBtcPrice(): Promise<BtcPriceData> {
 	}
 }
 
-// Fetches the BTC price history for the last 24 hours
-// Returns the full, raw series — downsampling/formatting is the caller's job
+// Raw 24h price history; downsampling is the caller's job.
 export async function fetchBtcPriceHistory(): Promise<BtcPricePoint[]> {
 	const res = await fetch(
 		'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1',
@@ -38,7 +36,7 @@ export async function fetchBtcPriceHistory(): Promise<BtcPricePoint[]> {
 	}))
 }
 
-// Fetches the current USD/PLN rate
+// Current USD/PLN rate.
 export async function fetchUsdPlnRate(): Promise<number> {
 	const res = await fetch('https://open.er-api.com/v6/latest/USD')
 	if (!res.ok) throw new Error('Failed to fetch USD/PLN rate')

@@ -1,11 +1,17 @@
 import { useRef, useState } from 'react'
 import { colors, monoFont } from '../../theme'
+import { CURRENCY_TOGGLE_DELAY_MS } from '../../constants'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { currencyToggled } from '../../store/slices/currencySlice'
+import {
+	toggleStarted,
+	toggleCommitted,
+} from '../../store/slices/currencySlice'
 
 export function CurrencyToggle() {
 	const dispatch = useAppDispatch()
 	const currency = useAppSelector(state => state.currency.currency)
+
+	const [displayCurrency, setDisplayCurrency] = useState(currency)
 
 	const [iconRotation, setIconRotation] = useState(0)
 	const [isAnimating, setIsAnimating] = useState(false)
@@ -13,7 +19,9 @@ export function CurrencyToggle() {
 	const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	function handleToggle() {
-		dispatch(currencyToggled())
+		const next = displayCurrency === 'USD' ? 'PLN' : 'USD'
+
+		setDisplayCurrency(next)
 
 		if (resetTimer.current) {
 			clearTimeout(resetTimer.current)
@@ -26,6 +34,12 @@ export function CurrencyToggle() {
 			setIsAnimating(false)
 			setIconRotation(0)
 		}, 350)
+
+		dispatch(toggleStarted())
+
+		setTimeout(() => {
+			dispatch(toggleCommitted())
+		}, CURRENCY_TOGGLE_DELAY_MS)
 	}
 
 	return (
@@ -41,7 +55,7 @@ export function CurrencyToggle() {
 						borderRadius: 12,
 						background:
 							'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.6), rgba(var(--color-amber-rgb), 0.2))',
-						opacity: currency === 'USD' ? 1 : 0,
+						opacity: displayCurrency === 'USD' ? 1 : 0,
 						transition: 'opacity .4s ease',
 					}}
 				/>
@@ -53,7 +67,7 @@ export function CurrencyToggle() {
 						borderRadius: 12,
 						background:
 							'linear-gradient(135deg, rgba(var(--color-indigo-rgb), 0.6), rgba(var(--color-violet-rgb), 0.2))',
-						opacity: currency === 'PLN' ? 1 : 0,
+						opacity: displayCurrency === 'PLN' ? 1 : 0,
 						transition: 'opacity .4s ease',
 					}}
 				/>
@@ -78,7 +92,7 @@ export function CurrencyToggle() {
 								className='absolute inset-0'
 								style={{
 									background: 'rgba(var(--color-surface-rgb), 0.08)',
-									opacity: currency === 'USD' ? 0 : 1,
+									opacity: displayCurrency === 'USD' ? 0 : 1,
 									transition: 'opacity .3s ease',
 								}}
 							/>
@@ -87,7 +101,7 @@ export function CurrencyToggle() {
 								className='absolute inset-0'
 								style={{
 									background: `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`,
-									opacity: currency === 'USD' ? 1 : 0,
+									opacity: displayCurrency === 'USD' ? 1 : 0,
 									transition: 'opacity .3s ease',
 								}}
 							/>
@@ -96,7 +110,7 @@ export function CurrencyToggle() {
 								className='relative flex items-center justify-center w-full h-full text-xs font-bold'
 								style={{
 									color:
-										currency === 'USD'
+										displayCurrency === 'USD'
 											? 'rgb(var(--color-on-mint-rgb))'
 											: colors.textMuted,
 									fontFamily: monoFont,
@@ -108,7 +122,8 @@ export function CurrencyToggle() {
 						<span
 							className='text-sm font-medium transition-colors duration-300'
 							style={{
-								color: currency === 'USD' ? colors.mint : colors.textMuted,
+								color:
+									displayCurrency === 'USD' ? colors.mint : colors.textMuted,
 								fontFamily: monoFont,
 							}}>
 							USD
@@ -142,7 +157,9 @@ export function CurrencyToggle() {
 							className='text-sm font-medium transition-colors duration-300'
 							style={{
 								color:
-									currency === 'PLN' ? colors.indigoLight : colors.textMuted,
+									displayCurrency === 'PLN'
+										? colors.indigoLight
+										: colors.textMuted,
 								fontFamily: monoFont,
 							}}>
 							PLN
@@ -153,7 +170,7 @@ export function CurrencyToggle() {
 								className='absolute inset-0'
 								style={{
 									background: 'rgba(var(--color-surface-rgb), 0.08)',
-									opacity: currency === 'PLN' ? 0 : 1,
+									opacity: displayCurrency === 'PLN' ? 0 : 1,
 									transition: 'opacity .3s ease',
 								}}
 							/>
@@ -162,7 +179,7 @@ export function CurrencyToggle() {
 								className='absolute inset-0'
 								style={{
 									background: `linear-gradient(135deg, ${colors.indigo}, ${colors.indigoLight})`,
-									opacity: currency === 'PLN' ? 1 : 0,
+									opacity: displayCurrency === 'PLN' ? 1 : 0,
 									transition: 'opacity .3s ease',
 								}}
 							/>
@@ -171,7 +188,7 @@ export function CurrencyToggle() {
 								className='relative flex items-center justify-center w-full h-full text-xs font-bold'
 								style={{
 									color:
-										currency === 'PLN'
+										displayCurrency === 'PLN'
 											? 'rgb(var(--color-on-accent-rgb))'
 											: colors.textMuted,
 									fontFamily: monoFont,
