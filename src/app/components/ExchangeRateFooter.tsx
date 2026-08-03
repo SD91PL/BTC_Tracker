@@ -15,8 +15,8 @@ export function ExchangeRateFooter({
 	usdPlnRate,
 }: ExchangeRateFooterProps) {
 	return (
-		<div className='px-6 pb-5 text-center'>
-			<div className='relative inline-block group'>
+		<div className='px-3 pb-4.5 text-center'>
+			<button className='relative inline-block px-3 py-1 group'>
 				<p
 					className='text-xs cursor-help'
 					style={{ color: colors.textFaint, fontFamily: monoFont }}>
@@ -26,7 +26,7 @@ export function ExchangeRateFooter({
 				{hasRate && (
 					<div
 						className='pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-							opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap z-10'>
+							opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 whitespace-nowrap z-10'>
 						<div
 							style={{
 								background: 'rgba(var(--color-bg-rgb), 0.9)',
@@ -42,7 +42,7 @@ export function ExchangeRateFooter({
 						</div>
 					</div>
 				)}
-			</div>
+			</button>
 		</div>
 	)
 }
