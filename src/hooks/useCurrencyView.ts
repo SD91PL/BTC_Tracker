@@ -1,12 +1,15 @@
-import type { Currency } from '../types'
+import type { Currency, TimeRange } from '../types'
 import type { BtcTicker } from './useBtcTicker'
 import { formatCurrency, formatUSD, formatPLN } from '../utils/currency'
-import { formatDateTime } from '../utils/datetime'
+import { formatAxisLabel } from '../utils/datetime'
 import { NA } from '../constants'
 
 export interface ChartPoint {
 	time: string
 	price: number
+	// Raw timestamp, kept alongside the formatted axis label so the
+	// tooltip can render its own (fuller) date format.
+	timestamp: number
 }
 
 export interface CurrencyView {
@@ -22,6 +25,7 @@ export interface CurrencyView {
 export function useCurrencyView(
 	ticker: BtcTicker,
 	currency: Currency,
+	range: TimeRange,
 ): CurrencyView {
 	const { priceUSD, hasBtc, usdPlnRate, hasRate, chartSeries, hasHistory } =
 		ticker
@@ -45,8 +49,9 @@ export function useCurrencyView(
 
 	const chartData: ChartPoint[] = canShowChart
 		? chartSeries!.map(d => ({
-				time: formatDateTime(d.timestamp),
+				time: formatAxisLabel(d.timestamp, range),
 				price: currency === 'PLN' ? Math.round(d.price * usdPlnRate!) : d.price,
+				timestamp: d.timestamp,
 			}))
 		: []
 

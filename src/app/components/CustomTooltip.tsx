@@ -1,20 +1,24 @@
 import { formatCurrency } from '../../utils/currency'
+import { formatTooltipLabel } from '../../utils/datetime'
 import { colors, monoFont } from '../../theme'
 import { useAppSelector } from '../../store/hooks'
+import type { ChartPoint } from '../../hooks/useCurrencyView'
 
 interface CustomTooltipProps {
 	active?: boolean
-	payload?: { value: number }[]
-	label?: string
+	payload?: { value: number; payload: ChartPoint }[]
 }
 
-export function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+export function CustomTooltip({ active, payload }: CustomTooltipProps) {
 	const currency = useAppSelector(state => state.currency.currency)
+	const range = useAppSelector(state => state.timeRange.range)
 
 	if (!active || !payload || !payload.length) return null
 
 	// Values already converted by useCurrencyView.
 	const value = formatCurrency(payload[0].value, currency)
+	// Fuller date than the axis tick, formatted for the active range.
+	const label = formatTooltipLabel(payload[0].payload.timestamp, range)
 
 	return (
 		<div

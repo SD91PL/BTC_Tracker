@@ -1,17 +1,22 @@
 import { colors, monoFont } from '../../theme'
-import { NA } from '../../constants'
+import { NA, TIME_RANGES, RANGE_CONFIG } from '../../constants'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { rangeChanged } from '../../store/slices/timeRangeSlice'
 
 interface CardHeaderProps {
 	hasChange: boolean
 	isPositive: boolean
-	change24h: string | null
+	changePercent: string | null
 }
 
 export function CardHeader({
 	hasChange,
 	isPositive,
-	change24h,
+	changePercent,
 }: CardHeaderProps) {
+	const dispatch = useAppDispatch()
+	const range = useAppSelector(state => state.timeRange.range)
+
 	return (
 		<div className='flex items-center justify-between px-6 pt-6 pb-4'>
 			<div className='flex items-center gap-2.5'>
@@ -38,10 +43,34 @@ export function CardHeader({
 				</div>
 			</div>
 			<div className='text-right'>
+				{/* Inline range picker — doubles as the "what period is this
+				    change over" label. Active range is bold + mint. All ranges
+				    are selectable: CoinGecko serves 24h-1y directly, and 5y/Max
+				    (plus any range CoinGecko fails on) fall back to
+				    blockchain.info — see fetchRangeHistory. */}
 				<p
-					className='text-xs mb-0.5'
-					style={{ color: colors.textMuted, fontFamily: monoFont }}>
-					24h
+					id='change-time-label'
+					role='tablist'
+					aria-label='Chart time range'
+					className='text-xs mb-0.5 flex items-center justify-end gap-1.5'
+					style={{ fontFamily: monoFont }}>
+					{TIME_RANGES.map(r => {
+						const isActive = r === range
+						return (
+							<button
+								key={r}
+								role='tab'
+								aria-selected={isActive}
+								onClick={() => dispatch(rangeChanged(r))}
+								className='cursor-pointer transition-colors duration-200 hover:opacity-80'
+								style={{
+									color: isActive ? colors.mint : colors.textMuted,
+									fontWeight: isActive ? 700 : 400,
+								}}>
+								{RANGE_CONFIG[r].headerLabel}
+							</button>
+						)
+					})}
 				</p>
 				<p
 					className='text-sm font-medium'
@@ -53,7 +82,7 @@ export function CardHeader({
 								: colors.negative,
 						fontFamily: monoFont,
 					}}>
-					{hasChange ? `${isPositive ? '+' : ''}${change24h}%` : NA}
+					{hasChange ? `${isPositive ? '+' : ''}${changePercent}%` : NA}
 				</p>
 			</div>
 		</div>

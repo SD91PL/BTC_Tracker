@@ -12,9 +12,10 @@ import { useAppSelector } from '../store/hooks'
 export default function App() {
 	const currency = useAppSelector(state => state.currency.currency)
 	const themeMode = useAppSelector(state => state.theme.mode)
+	const timeRange = useAppSelector(state => state.timeRange.range)
 
-	const ticker = useBtcTicker()
-	const view = useCurrencyView(ticker, currency)
+	const ticker = useBtcTicker(timeRange)
+	const view = useCurrencyView(ticker, currency, timeRange)
 
 	// Sync theme to data-theme attribute (colors live in theme.css).
 	useEffect(() => {
@@ -51,12 +52,14 @@ export default function App() {
 					<CardHeader
 						hasChange={ticker.hasChange}
 						isPositive={ticker.isPositive}
-						change24h={ticker.change24h}
+						changePercent={ticker.changePercent}
 					/>
 
 					<PriceChart
 						chartData={view.chartData}
 						canShowChart={view.canShowChart}
+						isHistoryFetching={ticker.isHistoryFetching}
+						historySource={ticker.historySource}
 					/>
 
 					<PriceDisplay

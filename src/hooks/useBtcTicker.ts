@@ -1,38 +1,46 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import {
 	fetchBtcPrice,
-	fetchBtcPriceHistory,
+	fetchRangeHistory,
 	fetchUsdPlnRate,
 	type BtcPricePoint,
+	type HistorySource,
 } from '../api/prices'
 import { sampleEvenly } from '../utils/array'
 import {
-	CHART_POINTS,
+	RANGE_CONFIG,
 	BTC_PRICE_REFETCH_INTERVAL_MS,
 	BTC_PRICE_STALE_TIME_MS,
-	BTC_HISTORY_REFETCH_INTERVAL_MS,
-	BTC_HISTORY_STALE_TIME_MS,
 	USD_PLN_REFETCH_INTERVAL_MS,
 	USD_PLN_STALE_TIME_MS,
 } from '../constants'
+import type { TimeRange } from '../types'
 
 export interface BtcTicker {
 	priceUSD: number | null
 	hasBtc: boolean
-	change24h: string | null
+	// % change over the selected range (e.g. 24h, 1w, ... max), not always 24h.
+	changePercent: string | null
 	isPositive: boolean
 	hasChange: boolean
 	usdPlnRate: number | null
 	hasRate: boolean
 	chartSeries: BtcPricePoint[] | null
 	hasHistory: boolean
+	isHistoryFetching: boolean
+	// Which API actually served the current history — CoinGecko normally,
+	// blockchain.info for 5Y/MAX (or as a backup if CoinGecko fails).
+	historySource: HistorySource | null
 	isError: boolean
 	refetchAll: () => void
 }
 
-// Fetches current price, 24h history, and USD/PLN rate (all in raw USD).
+// Fetches current price, range-scoped history, and USD/PLN rate (all in raw USD).
 // Currency formatting is handled by useCurrencyView.
-export function useBtcTicker(): BtcTicker {
+export function useBtcTicker(range: TimeRange): BtcTicker {
+	const rangeConfig = RANGE_CONFIG[range]
+
 	const {
 		data: btcPriceData,
 		isError: btcIsError,
@@ -45,15 +53,24 @@ export function useBtcTicker(): BtcTicker {
 	})
 
 	const {
-		data: historyData,
+		data: historyResult,
 		isError: historyIsError,
+		isFetching: isHistoryFetching,
 		refetch: refetchHistory,
 	} = useQuery({
-		queryKey: ['btc-price-history'],
-		queryFn: fetchBtcPriceHistory,
-		select: data => sampleEvenly(data, CHART_POINTS),
-		refetchInterval: BTC_HISTORY_REFETCH_INTERVAL_MS,
-		staleTime: BTC_HISTORY_STALE_TIME_MS,
+		// Each range is cached independently, so switching back to a
+		// previously-viewed range is instant.
+		queryKey: ['btc-price-history', range],
+		queryFn: () =>
+			fetchRangeHistory(
+				rangeConfig.coinGeckoDays,
+				rangeConfig.blockchainInfoTimespan,
+			),
+		refetchInterval: rangeConfig.refetchIntervalMs,
+		staleTime: rangeConfig.staleTimeMs,
+		// Keep showing the previous range's chart (instead of a blank/NA state)
+		// while the new range loads in the background.
+		placeholderData: keepPreviousData,
 	})
 
 	const {
@@ -69,27 +86,37 @@ export function useBtcTicker(): BtcTicker {
 
 	// Null means unavailable — UI shows "N/A", never a guessed value.
 	const priceUSD = btcPriceData?.price ?? null
-	const change24hRaw = btcPriceData?.change24h ?? null
 	const usdPlnRate = usdPlnRateData ?? null
-	const priceHistory = historyData ?? null
+	const rawHistory = historyResult?.points ?? null
+	const historySource = historyResult?.source ?? null
 
 	const hasBtc = priceUSD != null
-	const hasChange = change24hRaw != null
 	const hasRate = usdPlnRate != null
-	const hasHistory = priceHistory != null && priceHistory.length > 0
 
-	const change24h = hasChange ? change24hRaw.toFixed(2) : null
-	const isPositive = hasChange && change24hRaw >= 0
+	// Downsample for the chart, then align the last point with the live
+	// price (the history query can be a little stale by comparison).
+	const chartSeries = useMemo<BtcPricePoint[] | null>(() => {
+		if (!rawHistory || rawHistory.length === 0) return null
+		const sampled = sampleEvenly(rawHistory, rangeConfig.chartPoints)
+		if (!hasBtc) return sampled
+		return [...sampled.slice(0, -1), { timestamp: Date.now(), price: priceUSD! }]
+	}, [rawHistory, rangeConfig.chartPoints, hasBtc, priceUSD])
 
-	// Align chart's last point with current price (queries can be slightly out of sync).
-	const chartSeries = hasHistory
-		? hasBtc
-			? [
-					...priceHistory!.slice(0, -1),
-					{ timestamp: Date.now(), price: priceUSD! },
-				]
-			: priceHistory!
-		: null
+	const hasHistory = chartSeries != null && chartSeries.length > 0
+
+	// % change across the whole selected range: first raw history point vs.
+	// the live price. Computed the same way for every range (24h through
+	// max), so the header number always matches what the chart is showing.
+	const changePercentRaw = useMemo(() => {
+		if (!rawHistory || rawHistory.length === 0 || !hasBtc) return null
+		const startPrice = rawHistory[0].price
+		if (!startPrice) return null
+		return ((priceUSD! - startPrice) / startPrice) * 100
+	}, [rawHistory, hasBtc, priceUSD])
+
+	const hasChange = changePercentRaw != null
+	const changePercent = hasChange ? changePercentRaw!.toFixed(2) : null
+	const isPositive = hasChange && changePercentRaw! >= 0
 
 	function refetchAll() {
 		refetchBtc()
@@ -100,13 +127,15 @@ export function useBtcTicker(): BtcTicker {
 	return {
 		priceUSD,
 		hasBtc,
-		change24h,
+		changePercent,
 		isPositive,
 		hasChange,
 		usdPlnRate,
 		hasRate,
 		chartSeries,
 		hasHistory,
+		isHistoryFetching,
+		historySource,
 		isError: btcIsError || historyIsError || rateIsError,
 		refetchAll,
 	}
