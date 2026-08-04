@@ -82,7 +82,7 @@ export function PriceChart({
 								tickLine={false}
 								dy={8}
 								tick={{
-									fontSize: 9,
+									fontSize: '0.5625rem',
 									fill: 'var(--color-text-faint)',
 									fontFamily: monoFont,
 								}}
@@ -116,10 +116,10 @@ export function PriceChart({
 
 			{/* Which API served this range's history (CoinGecko normally, blockchain.info for 5Y/MAX or on failure). */}
 			<p
-				className='text-right text-[9px] pr-1 h-4'
+				className='text-right text-[0.5625rem] pt-0.5 pr-3 h-4'
 				style={{ color: 'var(--color-text-faint)', fontFamily: monoFont }}>
 				{canShowChart && historySource
-					? `via ${historySource === 'coingecko' ? 'coingecko.com' : 'blockchain.info'}`
+					? `${historySource === 'coingecko' ? 'coingecko.com' : 'blockchain.info'}`
 					: '\u00A0'}
 			</p>
 		</div>
