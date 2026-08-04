@@ -12,19 +12,12 @@ export const TIME_RANGES: TimeRange[] = ['1D', '1W', '1M', '1Y', '5Y', 'MAX']
 export interface RangeConfig {
 	// Compact label used in the CardHeader's inline range row (e.g. '24h', '1w').
 	headerLabel: string
-	// CoinGecko `days` query param. CoinGecko's free/public plan rejects
-	// anything over 365 days, so 5Y/MAX set this to null — those ranges
-	// skip CoinGecko entirely and go straight to the blockchain.info fallback.
+	// CoinGecko `days` query param. Null for 5Y/MAX (free plan caps at 365 days),
+	// so those ranges go straight to the blockchain.info fallback.
 	coinGeckoDays: string | null
-	// blockchain.info `timespan` param (charts/market-price). Used as the
-	// primary source when coinGeckoDays is null, and as a fallback if
-	// CoinGecko fails — but ONLY set for ranges where blockchain.info's
-	// daily-resolution data is an acceptable substitute (1M and up). For
-	// 1D/1W this is null on purpose: blockchain.info can return as few as
-	// 1-2 daily points for a 1-2 day span, which — after we snap the last
-	// point to the live price — renders as a near-empty "chart" that looks
-	// like it covers an hour, not a day. Better to surface a real error
-	// there than silently show misleading data.
+	// blockchain.info `timespan` param (charts/market-price): primary source
+	// when coinGeckoDays is null, fallback if CoinGecko fails. Null for 1D/1W —
+	// blockchain.info's daily resolution is too coarse to be a fair substitute there.
 	blockchainInfoTimespan: string | null
 	// Target point count after downsampling (chart stays readable at any range).
 	chartPoints: number
@@ -33,7 +26,7 @@ export interface RangeConfig {
 }
 
 // Per-range history fetch + downsampling config.
-// CoinGecko auto-granularity: 1 day -> 5-min data, 2-90 days -> hourly, above -> daily.
+// CoinGecko auto-granularity: 1 day -> 5-min, 2-90 days -> hourly, above -> daily.
 export const RANGE_CONFIG: Record<TimeRange, RangeConfig> = {
 	'1D': {
 		headerLabel: '24h',

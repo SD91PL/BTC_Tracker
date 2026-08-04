@@ -43,11 +43,7 @@ export function CardHeader({
 				</div>
 			</div>
 			<div className='text-right'>
-				{/* Inline range picker — doubles as the "what period is this
-				    change over" label. Active range is bold + mint. All ranges
-				    are selectable: CoinGecko serves 24h-1y directly, and 5y/Max
-				    (plus any range CoinGecko fails on) fall back to
-				    blockchain.info — see fetchRangeHistory. */}
+				{/* Range picker; also labels what period the % change below covers. */}
 				<p
 					id='change-time-label'
 					role='tablist'

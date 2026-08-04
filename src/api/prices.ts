@@ -24,8 +24,8 @@ async function fetchBtcPriceFromCoinGecko(): Promise<number> {
 	return data.bitcoin.usd as number
 }
 
-// blockchain.info's /stats endpoint carries a live market_price_usd field,
-// so it doubles as a backup for the current price too, not just history.
+// blockchain.info's /stats endpoint also exposes a live price, so it
+// doubles as a backup for the current price, not just history.
 async function fetchBtcPriceFromBlockchainInfo(): Promise<number> {
 	const res = await fetch('https://api.blockchain.info/stats?format=json&cors=true')
 	if (!res.ok) throw new Error('Failed to fetch BTC price (fallback)')
@@ -63,9 +63,8 @@ async function fetchBtcPriceHistoryFromCoinGecko(
 	}))
 }
 
-// blockchain.info's free, keyless charts API — BTC/USD only, but its history
-// goes back to 2010, so it covers the ranges CoinGecko's free plan can't
-// (5Y/MAX) and works as a general backup if CoinGecko is unreachable.
+// blockchain.info's free, keyless charts API (BTC/USD only, history back to
+// 2010) — covers 5Y/MAX and backs up CoinGecko if it's unreachable.
 // Docs: https://www.blockchain.com/api/charts_api
 async function fetchBtcPriceHistoryFromBlockchainInfo(
 	timespan: string,
@@ -84,14 +83,9 @@ async function fetchBtcPriceHistoryFromBlockchainInfo(
 	}))
 }
 
-// Fetches history for a range, preferring CoinGecko and transparently
-// falling back to blockchain.info when CoinGecko can't serve it — either
-// because the range is out of reach on the free plan (coinGeckoDays is
-// null) or because the CoinGecko request itself failed. If the range has
-// no configured fallback (blockchainInfoTimespan is null — true for 1D/1W,
-// where blockchain.info's daily resolution would be misleading), the
-// original CoinGecko error is rethrown instead of masking it with data
-// that doesn't actually match the requested range.
+// Fetches history for a range: CoinGecko first, falling back to
+// blockchain.info if CoinGecko is out of reach or fails. Ranges with no
+// fallback configured (1D/1W) rethrow the original CoinGecko error instead.
 export async function fetchRangeHistory(
 	coinGeckoDays: string | null,
 	blockchainInfoTimespan: string | null,

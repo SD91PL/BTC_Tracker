@@ -114,10 +114,7 @@ export function PriceChart({
 				</div>
 			</div>
 
-			{/* Always shown: which API this range's history actually came from.
-			    Normally CoinGecko; blockchain.info for 5Y/MAX, or any range
-			    where CoinGecko itself failed (see fetchRangeHistory). Its own
-			    row below the chart so it never overlaps the X-axis ticks. */}
+			{/* Which API served this range's history (CoinGecko normally, blockchain.info for 5Y/MAX or on failure). */}
 			<p
 				className='text-right text-[9px] pr-1 h-4'
 				style={{ color: 'var(--color-text-faint)', fontFamily: monoFont }}>
