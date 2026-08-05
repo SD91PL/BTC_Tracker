@@ -1,8 +1,8 @@
 import type { TimeRange } from '../types'
 
 // Short label for chart X-axis ticks — granularity matches the selected range
-// so labels stay meaningful without crowding the axis (e.g. hours for 1D,
-// weekday for 1W, month for 1Y+).
+// so labels stay meaningful without crowding the axis (24h hour for 1D, weekday
+// for 1W, date for 1M, short month for 1Y, bare year for 5Y/MAX).
 export function formatAxisLabel(timestamp: number, range: TimeRange): string {
 	const date = new Date(timestamp)
 
@@ -11,6 +11,7 @@ export function formatAxisLabel(timestamp: number, range: TimeRange): string {
 			return date.toLocaleString('en-US', {
 				hour: '2-digit',
 				minute: '2-digit',
+				hourCycle: 'h23',
 			})
 		case '1W':
 			return date.toLocaleString('en-US', { weekday: 'short' })
@@ -23,10 +24,8 @@ export function formatAxisLabel(timestamp: number, range: TimeRange): string {
 			return date.toLocaleString('en-US', { month: 'short' })
 		case '5Y':
 		case 'MAX':
-			return date.toLocaleString('en-US', {
-				month: 'short',
-				year: '2-digit',
-			})
+			// Years only — dense ranges where month-level ticks would be too crowded.
+			return date.toLocaleString('en-US', { year: 'numeric' })
 	}
 }
 
@@ -42,6 +41,7 @@ export function formatTooltipLabel(timestamp: number, range: TimeRange): string 
 				month: '2-digit',
 				hour: '2-digit',
 				minute: '2-digit',
+				hourCycle: 'h23',
 			})
 		case '1W':
 		case '1M':
@@ -51,17 +51,18 @@ export function formatTooltipLabel(timestamp: number, range: TimeRange): string 
 				month: '2-digit',
 				hour: '2-digit',
 				minute: '2-digit',
+				hourCycle: 'h23',
 			})
 		case '1Y':
 			return date.toLocaleString('en-US', {
 				day: '2-digit',
-				month: 'long',
+				month: 'short',
 				year: 'numeric',
 			})
 		case '5Y':
 		case 'MAX':
 			return date.toLocaleString('en-US', {
-				month: 'long',
+				month: 'short',
 				year: 'numeric',
 			})
 	}
