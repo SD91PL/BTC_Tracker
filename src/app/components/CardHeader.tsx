@@ -58,7 +58,7 @@ export function CardHeader({
 								role='tab'
 								aria-selected={isActive}
 								onClick={() => dispatch(rangeChanged(r))}
-								className='cursor-pointer transition-colors duration-200 hover:opacity-80'
+								className='px-0.5 cursor-pointer transition-colors duration-200 hover:opacity-80'
 								style={{
 									color: isActive ? colors.mint : colors.textMuted,
 									fontWeight: isActive ? 700 : 400,
