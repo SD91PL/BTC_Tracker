@@ -24,13 +24,13 @@ export function CustomTooltip({ active, payload }: CustomTooltipProps) {
 		<div
 			style={{
 				background: 'rgba(var(--color-bg-rgb), 0.85)',
-				border: '1px solid rgba(var(--color-bitcoin-rgb), 0.3)',
-				backdropFilter: 'blur(12px)',
+				border: '0.0625rem solid rgba(var(--color-bitcoin-rgb), 0.3)',
+				backdropFilter: 'blur(0.75rem)',
 			}}
 			className='px-3 py-2 rounded-lg'>
 			<p
 				style={{ color: colors.textMuted, fontFamily: monoFont }}
-				className='text-[10px] mb-0.5'>
+				className='text-[0.625rem] mb-0.5'>
 				{label}
 			</p>
 			<p

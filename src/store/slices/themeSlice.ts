@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { appReset } from '../actions'
 
 export type ThemeMode = 'light' | 'dark'
 
@@ -18,6 +19,9 @@ const themeSlice = createSlice({
 		themeToggled(state) {
 			state.mode = state.mode === 'dark' ? 'light' : 'dark'
 		},
+	},
+	extraReducers: builder => {
+		builder.addCase(appReset, () => initialState)
 	},
 })
 

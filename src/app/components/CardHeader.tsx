@@ -18,7 +18,7 @@ export function CardHeader({
 	const range = useAppSelector(state => state.timeRange.range)
 
 	return (
-		<div className='flex items-center justify-between px-6 pt-6 pb-4'>
+		<div className='flex items-center justify-between px-6 pt-6 pb-4 gap-2.5'>
 			<div className='flex items-center gap-2.5'>
 				<div
 					className='w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold'
@@ -43,7 +43,7 @@ export function CardHeader({
 				</div>
 			</div>
 			<div className='text-right'>
-				{/* Range picker; also labels what period the % change below covers. */}
+				{/* Range picker; also labels the % change period below. */}
 				<p
 					id='change-time-label'
 					role='tablist'

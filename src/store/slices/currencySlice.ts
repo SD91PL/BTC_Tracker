@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { Currency } from '../../types'
+import { appReset } from '../actions'
 
 export interface CurrencyState {
 	currency: Currency
@@ -25,6 +26,9 @@ const currencySlice = createSlice({
 			state.currency = state.currency === 'USD' ? 'PLN' : 'USD'
 			state.animating = false
 		},
+	},
+	extraReducers: builder => {
+		builder.addCase(appReset, () => initialState)
 	},
 })
 

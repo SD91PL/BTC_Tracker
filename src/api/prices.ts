@@ -24,8 +24,7 @@ async function fetchBtcPriceFromCoinGecko(): Promise<number> {
 	return data.bitcoin.usd as number
 }
 
-// blockchain.info's /stats endpoint also exposes a live price, so it
-// doubles as a backup for the current price, not just history.
+// Also serves as a backup source for the current price.
 async function fetchBtcPriceFromBlockchainInfo(): Promise<number> {
 	const res = await fetch('https://api.blockchain.info/stats?format=json&cors=true')
 	if (!res.ok) throw new Error('Failed to fetch BTC price (fallback)')
@@ -33,8 +32,7 @@ async function fetchBtcPriceFromBlockchainInfo(): Promise<number> {
 	return data.market_price_usd as number
 }
 
-// Current BTC price. The % change shown in the UI is derived from the
-// selected range's history (see useBtcTicker), not fetched separately here.
+// Current BTC price; % change is derived elsewhere from history.
 export async function fetchBtcPrice(): Promise<BtcPriceData> {
 	try {
 		const price = await fetchBtcPriceFromCoinGecko()
@@ -45,8 +43,7 @@ export async function fetchBtcPrice(): Promise<BtcPriceData> {
 	}
 }
 
-// Raw price history for the given range; downsampling is the caller's job.
-// `days` is CoinGecko's own param: any integer (free plan caps this at 365).
+// Raw history for a range; downsampling is the caller's job.
 async function fetchBtcPriceHistoryFromCoinGecko(
 	days: string,
 ): Promise<BtcPricePoint[]> {
@@ -63,8 +60,7 @@ async function fetchBtcPriceHistoryFromCoinGecko(
 	}))
 }
 
-// blockchain.info's free, keyless charts API (BTC/USD only, history back to
-// 2010) — covers 5Y/MAX and backs up CoinGecko if it's unreachable.
+// Free keyless API; covers 5Y/MAX and backs up CoinGecko.
 // Docs: https://www.blockchain.com/api/charts_api
 async function fetchBtcPriceHistoryFromBlockchainInfo(
 	timespan: string,
@@ -83,9 +79,8 @@ async function fetchBtcPriceHistoryFromBlockchainInfo(
 	}))
 }
 
-// Fetches history for a range: CoinGecko first, falling back to
-// blockchain.info if CoinGecko is out of reach or fails. Ranges with no
-// fallback configured (1D/1W) rethrow the original CoinGecko error instead.
+// CoinGecko first, falls back to blockchain.info if needed.
+// Ranges without a fallback (1D/1W) rethrow the CoinGecko error.
 export async function fetchRangeHistory(
 	coinGeckoDays: string | null,
 	blockchainInfoTimespan: string | null,

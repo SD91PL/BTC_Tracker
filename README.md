@@ -14,6 +14,8 @@ https://sd91pl.github.io/BTC_Tracker/
 - Dual data source with automatic fallback: CoinGecko is primary; blockchain.info covers 5y/max (outside CoinGecko's free-plan range) and steps in if CoinGecko fails. The active source is shown under the chart
 - Currency switching between USD and PLN with fade animation
 - Light/dark theme toggle with animated UI
+- Resizable card layout — unlock via the width toggle, then drag either edge (or pinch on touch) to widen or narrow the card; the chart's axis density adapts live to the new width
+- One-click reset button that snaps theme, currency, time range, and card width/lock state back to their defaults
 - Responsive UI optimized for desktop and mobile
 - Data fetching & caching with TanStack Query — each time range is cached independently, so switching back is instant
 - Fallback to N/A when external data is unavailable
@@ -62,10 +64,12 @@ The application uses external APIs to provide up-to-date market information:
 src/
 ├── api/                # External API calls (CoinGecko, blockchain.info, exchange rate)
 ├── app/                # App shell
-│   └── components/     # UI components (header/range picker, chart, price, toggles, footer)
-├── hooks/              # Data-fetching and derived-view hooks (TanStack Query)
+│   └── components/     # UI components (header/range picker, chart, price, toggles,
+│                       # resizable card wrapper, reset button, footer)
+├── hooks/              # Data-fetching and derived-view hooks (TanStack Query, card resize)
 ├── store/              # Redux Toolkit store (client-side UI state)
-│   ├── slices/         # currency + theme + timeRange slices
+│   ├── slices/         # currency + theme + timeRange + resize slices
+│   ├── actions.ts       # Shared `appReset` action, handled by every slice
 │   ├── hooks.ts        # Typed useAppDispatch / useAppSelector
 │   └── index.ts        # Store configuration
 ├── styles/             # Global CSS + theme tokens (theme.css)
@@ -81,13 +85,20 @@ src/
 The project is split into two layers:
 
 - **Server data** (BTC price, range-scoped history, USD/PLN rate) is fetched and cached via **TanStack Query** in `hooks/`. Each time range is a separate query, so switching ranges never refetches data that's already cached.
-- **Client-side UI state** (selected currency + toggle animation, light/dark theme, selected chart time range) lives in the **Redux Toolkit** store under `store/`.
+- **Client-side UI state** (selected currency + toggle animation, light/dark theme, selected chart time range, card resize lock + custom width) lives in the **Redux Toolkit** store under `store/`, split into `currency`, `theme`, `timeRange`, and `resize` slices.
+- A shared `appReset` action (`store/actions.ts`) is dispatched by the reset button; every slice handles it via `extraReducers` to snap back to its own `initialState` in a single dispatch.
 
 ## 🌗 Theming
 
 The app supports light and dark themes, toggled via the switch beneath the card. Theme state lives in the Redux `theme` slice; `App.tsx` syncs it to a `data-theme` attribute on `<html>`, which drives all colors.
 
 All colors are defined as CSS custom properties in `src/styles/theme.css` (dark is the default/fallback). `src/theme.ts` re-exports the solid tokens as `var(--color-…)` strings for use in inline styles, so they stay reactive to theme changes.
+
+## ↔️ Resizable Layout & Reset
+
+Beneath the card, the width toggle unlocks free horizontal resizing: drag either edge of the card on desktop, or pinch with two fingers on touch devices, to stretch or shrink it. The chart reacts live — its X-axis tick density scales with the current width, and its own draw-in animation is suppressed while a resize is in progress so the line tracks the drag smoothly. The committed width is clamped between `CARD_MIN_WIDTH_PX` and `CARD_MAX_WIDTH_RATIO` of the available space (both defined once in `constants.ts` and shared by the hook and the wrapper), and is persisted in the `resize` Redux slice alongside the lock state.
+
+The reset button next to it restores the app to its defaults in one click — theme, currency, selected time range, and the card's lock/width — by dispatching the shared `appReset` action.
 
 ## 📦 Installation
 

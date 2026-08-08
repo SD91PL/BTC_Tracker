@@ -30,13 +30,13 @@ export function ExchangeRateFooter({
 						<div
 							style={{
 								background: 'rgba(var(--color-bg-rgb), 0.9)',
-								border: '1px solid rgba(var(--color-bitcoin-rgb), 0.3)',
-								backdropFilter: 'blur(12px)',
+								border: '0.0625rem solid rgba(var(--color-bitcoin-rgb), 0.3)',
+								backdropFilter: 'blur(0.75rem)',
 							}}
 							className='px-3 py-1.5 rounded-lg'>
 							<p
 								style={{ color: colors.mint, fontFamily: monoFont }}
-								className='text-[11px]'>
+								className='text-[0.6875rem]'>
 								1 USD = {usdPlnRate!.toFixed(PRECISE_DECIMALS)} PLN
 							</p>
 						</div>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { colors, monoFont } from '../../theme'
 import { CURRENCY_TOGGLE_DELAY_MS } from '../../constants'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
@@ -17,6 +17,12 @@ export function CurrencyToggle() {
 	const [isAnimating, setIsAnimating] = useState(false)
 
 	const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	// Syncs the local display value with Redux when it changes externally
+	// (e.g. the reset button snapping currency back to USD).
+	useEffect(() => {
+		setDisplayCurrency(currency)
+	}, [currency])
 
 	function handleToggle() {
 		const next = displayCurrency === 'USD' ? 'PLN' : 'USD'
@@ -43,16 +49,17 @@ export function CurrencyToggle() {
 	}
 
 	return (
-		<div className='px-6 py-5'>
+		// Fixed width, centered — stays a stable tap target as the card widens.
+		<div className='px-6 py-5 flex justify-center'>
 			<button
 				onClick={handleToggle}
-				className='relative w-full overflow-hidden cursor-pointer'
-				style={{ borderRadius: 12 }}>
+				className='relative w-full max-w-[21rem] overflow-hidden cursor-pointer'
+				style={{ borderRadius: '0.75rem' }}>
 				{/* USD gradient */}
 				<div
 					className='absolute inset-0'
 					style={{
-						borderRadius: 12,
+						borderRadius: '0.75rem',
 						background:
 							'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.6), rgba(var(--color-amber-rgb), 0.2))',
 						opacity: displayCurrency === 'USD' ? 1 : 0,
@@ -64,7 +71,7 @@ export function CurrencyToggle() {
 				<div
 					className='absolute inset-0'
 					style={{
-						borderRadius: 12,
+						borderRadius: '0.75rem',
 						background:
 							'linear-gradient(135deg, rgba(var(--color-indigo-rgb), 0.6), rgba(var(--color-violet-rgb), 0.2))',
 						opacity: displayCurrency === 'PLN' ? 1 : 0,
@@ -74,12 +81,12 @@ export function CurrencyToggle() {
 
 				{/* Inner panel */}
 				<div
-					className='absolute inset-px'
+					className='absolute inset-[0.0625rem]'
 					style={{
-						borderRadius: 11,
+						borderRadius: '0.6875rem',
 						background: 'rgba(var(--color-bg-rgb), 0.6)',
-						backdropFilter: 'blur(8px)',
-						WebkitBackdropFilter: 'blur(8px)',
+						backdropFilter: 'blur(0.5rem)',
+						WebkitBackdropFilter: 'blur(0.5rem)',
 					}}
 				/>
 

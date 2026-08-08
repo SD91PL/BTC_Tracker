@@ -7,8 +7,7 @@ import { NA } from '../constants'
 export interface ChartPoint {
 	time: string
 	price: number
-	// Raw timestamp, kept alongside the formatted axis label so the
-	// tooltip can render its own (fuller) date format.
+	// Raw timestamp, kept for the tooltip's fuller date format.
 	timestamp: number
 }
 

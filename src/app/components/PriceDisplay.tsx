@@ -30,14 +30,14 @@ export function PriceDisplay({
 			<div
 				className='relative inline-block'
 				style={{
-					borderRadius: '12px',
-					padding: '1px',
+					borderRadius: '0.75rem',
+					padding: '0.0625rem',
 					background:
 						'linear-gradient(135deg, rgba(var(--color-mint-rgb), var(--price-panel-border-alpha-1)), rgba(var(--color-indigo-rgb), var(--price-panel-border-alpha-2)), rgba(var(--color-mint-rgb), var(--price-panel-border-alpha-3)))',
 				}}>
 				<div
 					className='px-6 py-3'
-					style={{ borderRadius: '11px', background: 'rgba(var(--color-mint-rgb), var(--price-panel-fill-alpha))' }}>
+					style={{ borderRadius: '0.6875rem', background: 'rgba(var(--color-mint-rgb), var(--price-panel-fill-alpha))' }}>
 					<p
 						className='text-3xl font-semibold tracking-tight transition-opacity duration-150'
 						style={{

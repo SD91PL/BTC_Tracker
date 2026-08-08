@@ -1,5 +1,14 @@
 import type { TimeRange } from './types'
 
+// UI
+
+// Resizable card bounds — shared by useResizableBox and ResizableWrapper
+// so both use the same source instead of duplicated literals.
+export const CARD_MIN_WIDTH_PX = 326
+export const CARD_MAX_WIDTH_RATIO = 0.99
+
+// DATA MANAGEMENT
+
 export const NA = 'N/A'
 
 // Current price: frequent refetch (headline number).
@@ -10,14 +19,12 @@ export const BTC_PRICE_STALE_TIME_MS = 15_000
 export const TIME_RANGES: TimeRange[] = ['1D', '1W', '1M', '1Y', '5Y', 'MAX']
 
 export interface RangeConfig {
-	// Compact label used in the CardHeader's inline range row (e.g. '24h', '1w').
+	// Compact label shown in the range picker (e.g. '24h', '1w').
 	headerLabel: string
-	// CoinGecko `days` query param. Null for 5Y/MAX (free plan caps at 365 days),
-	// so those ranges go straight to the blockchain.info fallback.
+	// CoinGecko `days` param. Null for 5Y/MAX (free plan caps at 365 days).
 	coinGeckoDays: string | null
-	// blockchain.info `timespan` param (charts/market-price): primary source
-	// when coinGeckoDays is null, fallback if CoinGecko fails. Null for 1D/1W —
-	// blockchain.info's daily resolution is too coarse to be a fair substitute there.
+	// blockchain.info `timespan` param: primary when coinGeckoDays is null,
+	// fallback otherwise. Null for 1D/1W (resolution too coarse there).
 	blockchainInfoTimespan: string | null
 	// Target point count after downsampling (chart stays readable at any range).
 	chartPoints: number

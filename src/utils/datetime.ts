@@ -1,8 +1,6 @@
 import type { TimeRange } from '../types'
 
-// Short label for chart X-axis ticks — granularity matches the selected range
-// so labels stay meaningful without crowding the axis (24h hour for 1D, weekday
-// for 1W, date for 1M, short month for 1Y, bare year for 5Y/MAX).
+// X-axis tick label; granularity matches the selected range.
 export function formatAxisLabel(timestamp: number, range: TimeRange): string {
 	const date = new Date(timestamp)
 
@@ -29,8 +27,7 @@ export function formatAxisLabel(timestamp: number, range: TimeRange): string {
 	}
 }
 
-// Fuller label for the tooltip — always includes enough context to be
-// unambiguous on its own (unlike the terser axis label).
+// Fuller tooltip label with enough context to stand alone.
 export function formatTooltipLabel(timestamp: number, range: TimeRange): string {
 	const date = new Date(timestamp)
 

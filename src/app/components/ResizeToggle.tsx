@@ -1,25 +1,23 @@
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { themeToggled } from '../../store/slices/themeSlice'
+import { resizeLockToggled } from '../../store/slices/resizeSlice'
 import { colors } from '../../theme'
 
-// Track/thumb geometry, in rem so it scales with root font-size.
+// Matched geometry with ThemeToggle (rem-based for root font-size scaling).
 const TRACK_WIDTH = 4.5 // 72px
 const TRACK_HEIGHT = 2.25 // 36px
 const THUMB_SIZE = 1.75 // 28px
-const THUMB_INSET = (TRACK_HEIGHT - THUMB_SIZE) / 2 // 0.25rem / 4px
+const THUMB_INSET = (TRACK_HEIGHT - THUMB_SIZE) / 2 // 0.25rem
 
-export function ThemeToggle() {
+export function ResizeToggle() {
 	const dispatch = useAppDispatch()
-	const mode = useAppSelector(state => state.theme.mode)
-	const isDark = mode === 'dark'
+	const locked = useAppSelector(state => state.resize.locked)
+	const resizable = !locked
 
 	return (
 		<button
-			onClick={() => dispatch(themeToggled())}
-			aria-label={
-				isDark ? 'Switch to light theme' : 'Switch to dark theme'
-			}
-			aria-pressed={isDark}
+			onClick={() => dispatch(resizeLockToggled())}
+			aria-label={resizable ? 'Lock card width' : 'Allow resizing card width'}
+			aria-pressed={resizable}
 			className='relative cursor-pointer group'
 			style={{
 				width: `${TRACK_WIDTH}rem`,
@@ -40,7 +38,7 @@ export function ThemeToggle() {
 					WebkitBackdropFilter: 'blur(1rem)',
 					transition: 'background 0.4s ease',
 				}}>
-				{/* Sun icon */}
+				{/* Background hint icons */}
 				<span
 					className='absolute top-1/2 flex items-center justify-center transition-opacity duration-300'
 					style={{
@@ -49,12 +47,10 @@ export function ThemeToggle() {
 						height: `${THUMB_SIZE - 0.5}rem`,
 						transform: 'translateY(-50%)',
 						color: colors.textFaint,
-						opacity: isDark ? 0.5 : 0,
+						opacity: resizable ? 0.5 : 0,
 					}}>
-					<SunIcon />
+					<OpenLockIcon />
 				</span>
-
-				{/* Moon icon */}
 				<span
 					className='absolute top-1/2 flex items-center justify-center transition-opacity duration-300'
 					style={{
@@ -63,9 +59,9 @@ export function ThemeToggle() {
 						height: `${THUMB_SIZE - 0.5}rem`,
 						transform: 'translateY(-50%)',
 						color: colors.textFaint,
-						opacity: isDark ? 0 : 0.5,
+						opacity: resizable ? 0 : 0.5,
 					}}>
-					<MoonIcon />
+					<WidthArrowsIcon />
 				</span>
 
 				{/* Sliding thumb */}
@@ -74,32 +70,31 @@ export function ThemeToggle() {
 					style={{
 						width: `${THUMB_SIZE}rem`,
 						height: `${THUMB_SIZE}rem`,
-						left: isDark
+						left: resizable
 							? `${TRACK_WIDTH - THUMB_SIZE - THUMB_INSET}rem`
 							: `${THUMB_INSET}rem`,
 						transform: 'translateY(-50%)',
-						background: isDark
-							? `linear-gradient(135deg, ${colors.indigo}, ${colors.indigoLight})`
-							: `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`,
-						boxShadow: isDark
-							? '0 0.125rem 0.625rem rgba(var(--color-indigo-rgb), 0.5)'
-							: '0 0.125rem 0.625rem rgba(var(--color-mint-rgb), 0.5)',
+						background: resizable
+							? `linear-gradient(135deg, ${colors.mint}, ${colors.mintDark})`
+							: `linear-gradient(135deg, ${colors.indigo}, ${colors.indigoLight})`,
+						boxShadow: resizable
+							? '0 0.125rem 0.625rem rgba(var(--color-mint-rgb), 0.5)'
+							: '0 0.125rem 0.625rem rgba(var(--color-indigo-rgb), 0.5)',
 						transition:
 							'left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1), background 0.35s ease, box-shadow 0.35s ease',
 					}}>
 					<span
-						key={mode}
+						key={String(resizable)}
 						className='flex items-center justify-center'
 						style={{
 							width: `${THUMB_SIZE - 0.625}rem`,
 							height: `${THUMB_SIZE - 0.625}rem`,
-							// Moon: on-accent white; sun: on-mint (flips per theme).
-							color: isDark
-								? 'rgb(var(--color-on-accent-rgb))'
-								: 'rgb(var(--color-on-mint-rgb))',
+							color: resizable
+								? 'rgb(var(--color-on-mint-rgb))'
+								: 'rgb(var(--color-on-accent-rgb))',
 							animation: 'theme-toggle-pop 0.35s ease',
 						}}>
-						{isDark ? <MoonIcon filled /> : <SunIcon filled />}
+						{resizable ? <WidthArrowsIcon /> : <LockIcon />}
 					</span>
 				</span>
 			</div>
@@ -107,23 +102,25 @@ export function ThemeToggle() {
 	)
 }
 
-function SunIcon({ filled = false }: { filled?: boolean }) {
+// Closed padlock (locked state).
+function LockIcon() {
 	return (
 		<svg
 			width='100%'
 			height='100%'
 			viewBox='0 0 16 16'
 			fill='none'>
-			<circle
-				cx='8'
-				cy='8'
-				r='3.5'
-				fill={filled ? 'currentColor' : 'none'}
+			<rect
+				x='3'
+				y='7'
+				width='10'
+				height='7'
+				rx='1.5'
 				stroke='currentColor'
 				strokeWidth='1.5'
 			/>
 			<path
-				d='M8 0.5v2M8 13.5v2M15.5 8h-2M2.5 8h-2M13.4 2.6l-1.4 1.4M4 12l-1.4 1.4M13.4 13.4L12 12M4 4L2.6 2.6'
+				d='M5.5 7V4.8a2.5 2.5 0 0 1 5 0V7'
 				stroke='currentColor'
 				strokeWidth='1.5'
 				strokeLinecap='round'
@@ -132,7 +129,35 @@ function SunIcon({ filled = false }: { filled?: boolean }) {
 	)
 }
 
-function MoonIcon({ filled = false }: { filled?: boolean }) {
+// Open padlock (hint for unlocked/resizable side).
+function OpenLockIcon() {
+	return (
+		<svg
+			width='100%'
+			height='100%'
+			viewBox='0 0 16 16'
+			fill='none'>
+			<rect
+				x='3'
+				y='7'
+				width='10'
+				height='7'
+				rx='1.5'
+				stroke='currentColor'
+				strokeWidth='1.5'
+			/>
+			<path
+				d='M5.5 7V4.8a2.5 2.5 0 0 1 5 0'
+				stroke='currentColor'
+				strokeWidth='1.5'
+				strokeLinecap='round'
+			/>
+		</svg>
+	)
+}
+
+// Width arrows (resizable state + hint).
+function WidthArrowsIcon() {
 	return (
 		<svg
 			width='100%'
@@ -140,10 +165,16 @@ function MoonIcon({ filled = false }: { filled?: boolean }) {
 			viewBox='0 0 16 16'
 			fill='none'>
 			<path
-				d='M14 9.7A6.3 6.3 0 1 1 6.3 2a5 5 0 0 0 7.7 7.7Z'
-				fill={filled ? 'currentColor' : 'none'}
+				d='M2 3v10M14 3v10'
 				stroke='currentColor'
 				strokeWidth='1.5'
+				strokeLinecap='round'
+			/>
+			<path
+				d='M4.5 8h7M4.5 8L6.5 6M4.5 8l2 2M11.5 8l-2-2M11.5 8l-2 2'
+				stroke='currentColor'
+				strokeWidth='1.5'
+				strokeLinecap='round'
 				strokeLinejoin='round'
 			/>
 		</svg>

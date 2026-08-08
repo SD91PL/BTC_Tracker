@@ -17,22 +17,35 @@ interface PriceChartProps {
 	canShowChart: boolean
 	isHistoryFetching: boolean
 	historySource: HistorySource | null
+	/** Current card width in px — more room means more X-axis labels. */
+	width: number
+	/** True while the card is being dragged/pinched — suppresses recharts'
+	 * draw-in animation so the line tracks the live width. */
+	isResizing: boolean
 }
 
-// Target tick count on the X-axis — dense enough to convey the range's
-// shape, sparse enough not to crowd a ~350px-wide card.
-const TARGET_TICKS = 5
+// ~1 tick per this many px keeps labels readable at any card width.
+const PX_PER_TICK = 58
+const MIN_TICKS = 3
+const MAX_TICKS = 16
 
 export function PriceChart({
 	chartData,
 	canShowChart,
 	isHistoryFetching,
 	historySource,
+	width,
+	isResizing,
 }: PriceChartProps) {
-	// Skip every Nth tick so ~TARGET_TICKS labels show regardless of range.
+	// Target tick count scales with the card's current width.
+	const targetTicks = Math.min(
+		MAX_TICKS,
+		Math.max(MIN_TICKS, Math.round(width / PX_PER_TICK)),
+	)
+	// Skip every Nth tick so ~targetTicks labels show regardless of range.
 	const tickInterval = Math.max(
 		0,
-		Math.ceil(chartData.length / TARGET_TICKS) - 1,
+		Math.ceil(chartData.length / targetTicks) - 1,
 	)
 
 	return (
@@ -107,14 +120,14 @@ export function PriceChart({
 								fill='url(#btcGrad)'
 								dot={false}
 								activeDot={{ r: 4, fill: colors.mint, strokeWidth: 0 }}
-								isAnimationActive={!isHistoryFetching}
+								isAnimationActive={!isHistoryFetching && !isResizing}
 							/>
 						</AreaChart>
 					</ResponsiveContainer>
 				</div>
 			</div>
 
-			{/* Which API served this range's history (CoinGecko normally, blockchain.info for 5Y/MAX or on failure). */}
+			{/* Which API served this range's history. */}
 			<p
 				className='text-right text-[0.5625rem] pt-0.5 pr-3 h-4'
 				style={{ color: 'var(--color-text-faint)', fontFamily: monoFont }}>

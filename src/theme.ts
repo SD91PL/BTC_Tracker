@@ -1,5 +1,4 @@
-// Re-exports CSS custom properties from theme.css as var() strings
-// so inline styles stay reactive to light/dark theme changes.
+// Re-exports theme.css custom properties as var() strings for inline styles.
 
 export const colors = {
 	mint: 'var(--color-mint)',

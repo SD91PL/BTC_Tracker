@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useBtcTicker } from '../hooks/useBtcTicker'
 import { useCurrencyView } from '../hooks/useCurrencyView'
 import { CardHeader } from './components/CardHeader'
@@ -7,6 +7,9 @@ import { PriceDisplay } from './components/PriceDisplay'
 import { CurrencyToggle } from './components/CurrencyToggle'
 import { ExchangeRateFooter } from './components/ExchangeRateFooter'
 import { ThemeToggle } from './components/ThemeToggle'
+import { ResizeToggle } from './components/ResizeToggle'
+import { ResetButton } from './components/ResetButton'
+import { ResizableWrapper } from './components/ResizableWrapper'
 import { useAppSelector } from '../store/hooks'
 
 export default function App() {
@@ -14,7 +17,15 @@ export default function App() {
 	const themeMode = useAppSelector(state => state.theme.mode)
 	const timeRange = useAppSelector(state => state.timeRange.range)
 
-	const ticker = useBtcTicker(timeRange)
+	// Rendered card width in px, kept in sync by ResizableWrapper.
+	const [cardWidth, setCardWidth] = useState(384)
+	const handleCardWidthChange = useCallback((width: number) => setCardWidth(width), [])
+
+	// True during an active drag/pinch resize; suppresses chart animation.
+	const [isCardResizing, setIsCardResizing] = useState(false)
+	const handleCardResizingChange = useCallback((resizing: boolean) => setIsCardResizing(resizing), [])
+
+	const ticker = useBtcTicker(timeRange, cardWidth)
 	const view = useCurrencyView(ticker, currency, timeRange)
 
 	// Sync theme to data-theme attribute (colors live in theme.css).
@@ -31,64 +42,74 @@ export default function App() {
 				fontFamily: "'Outfit', sans-serif",
 				transition: 'background 0.4s ease',
 			}}>
-			{/* Gradient border */}
-			<div
-				className='relative w-full max-w-sm'
-				style={{
-					borderRadius: '20px',
-					padding: '1px',
-					background:
-						'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.5) 0%, rgba(var(--color-indigo-rgb), 0.2) 40%, rgba(var(--color-mint-rgb), 0.1) 100%)',
-				}}>
-				{/* Glass card */}
+			<ResizableWrapper
+				onWidthChange={handleCardWidthChange}
+				onResizingChange={handleCardResizingChange}>
+				{/* Gradient border */}
 				<div
-					className='relative w-full flex flex-col overflow-hidden'
+					className='relative w-full h-full'
 					style={{
-						borderRadius: '19px',
-						background: 'rgba(var(--color-bg-elevated-rgb), 0.75)',
-						backdropFilter: 'blur(24px)',
-						WebkitBackdropFilter: 'blur(24px)',
+						borderRadius: '1.25rem',
+						padding: '0.0625rem',
+						background:
+							'linear-gradient(135deg, rgba(var(--color-mint-rgb), 0.5) 0%, rgba(var(--color-indigo-rgb), 0.2) 40%, rgba(var(--color-mint-rgb), 0.1) 100%)',
 					}}>
-					<CardHeader
-						hasChange={ticker.hasChange}
-						isPositive={ticker.isPositive}
-						changePercent={ticker.changePercent}
-					/>
-
-					<PriceChart
-						chartData={view.chartData}
-						canShowChart={view.canShowChart}
-						isHistoryFetching={ticker.isHistoryFetching}
-						historySource={ticker.historySource}
-					/>
-
-					<PriceDisplay
-						displayPrice={view.displayPrice}
-						canShowPrice={view.canShowPrice}
-						secondaryLine={view.secondaryLine}
-						isError={ticker.isError}
-						onRetry={ticker.refetchAll}
-					/>
-
-					{/* Divider */}
+					{/* Glass card */}
 					<div
-						className='mx-6 h-px'
+						className='relative w-full h-full flex flex-col overflow-hidden'
 						style={{
-							background:
-								'linear-gradient(90deg, transparent, rgba(var(--color-mint-rgb), 0.2), transparent)',
-						}}
-					/>
+							borderRadius: '1.1875rem',
+							background: 'rgba(var(--color-bg-elevated-rgb), 0.75)',
+							backdropFilter: 'blur(1.5rem)',
+							WebkitBackdropFilter: 'blur(1.5rem)',
+						}}>
+						<CardHeader
+							hasChange={ticker.hasChange}
+							isPositive={ticker.isPositive}
+							changePercent={ticker.changePercent}
+						/>
 
-					<CurrencyToggle />
+						<PriceChart
+							chartData={view.chartData}
+							canShowChart={view.canShowChart}
+							isHistoryFetching={ticker.isHistoryFetching}
+							historySource={ticker.historySource}
+							width={cardWidth}
+							isResizing={isCardResizing}
+						/>
 
-					<ExchangeRateFooter
-						hasRate={ticker.hasRate}
-						usdPlnRate={ticker.usdPlnRate}
-					/>
+						<PriceDisplay
+							displayPrice={view.displayPrice}
+							canShowPrice={view.canShowPrice}
+							secondaryLine={view.secondaryLine}
+							isError={ticker.isError}
+							onRetry={ticker.refetchAll}
+						/>
+
+						{/* Divider */}
+						<div
+							className='mx-6 h-[0.0625rem]'
+							style={{
+								background:
+									'linear-gradient(90deg, transparent, rgba(var(--color-mint-rgb), 0.2), transparent)',
+							}}
+						/>
+
+						<CurrencyToggle />
+
+						<ExchangeRateFooter
+							hasRate={ticker.hasRate}
+							usdPlnRate={ticker.usdPlnRate}
+						/>
+					</div>
 				</div>
-			</div>
+			</ResizableWrapper>
 
-			<ThemeToggle />
+			<div className='flex items-center gap-3'>
+				<ResizeToggle />
+				<ResetButton />
+				<ThemeToggle />
+			</div>
 		</div>
 	)
 }
