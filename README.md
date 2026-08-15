@@ -14,7 +14,7 @@ https://sd91pl.github.io/BTC_Tracker/
 - Dual data source with automatic fallback: CoinGecko is primary; blockchain.info covers 5y/max (outside CoinGecko's free-plan range) and steps in if CoinGecko fails. The active source is shown under the chart
 - Currency switching between USD and PLN with fade animation
 - Light/dark theme toggle with animated UI
-- Resizable card layout — unlock via the width toggle, then drag either edge (or pinch on touch) to widen or narrow the card; the chart's axis density adapts live to the new width
+- Resizable card layout — unlock via the width toggle, then drag either edge (works with mouse or touch) or pinch with two fingers to widen or narrow the card; the chart's axis density adapts live to the new width
 - One-click reset button that snaps theme, currency, time range, and card width/lock state back to their defaults
 - Responsive UI optimized for desktop and mobile
 - Data fetching & caching with TanStack Query — each time range is cached independently, so switching back is instant
@@ -96,7 +96,7 @@ All colors are defined as CSS custom properties in `src/styles/theme.css` (dark 
 
 ## ↔️ Resizable Layout & Reset
 
-Beneath the card, the width toggle unlocks free horizontal resizing: drag either edge of the card on desktop, or pinch with two fingers on touch devices, to stretch or shrink it. The chart reacts live — its X-axis tick density scales with the current width, and its own draw-in animation is suppressed while a resize is in progress so the line tracks the drag smoothly. The committed width is clamped between `CARD_MIN_WIDTH_PX` and `CARD_MAX_WIDTH_RATIO` of the available space (both defined once in `constants.ts` and shared by the hook and the wrapper), and is persisted in the `resize` Redux slice alongside the lock state.
+Beneath the card, the width toggle unlocks free horizontal resizing: drag either edge of the card — with a mouse on desktop or a finger on touch devices — or pinch with two fingers, to stretch or shrink it. Edge dragging is handled via the Pointer Events API, so the same handler drives both mouse and touch; on touch devices the invisible hit-region around each edge widens (via a `pointer: coarse` media query in `resizable.css`) since a fingertip needs a much bigger target than a mouse cursor to land on it reliably. The chart reacts live — its X-axis tick density scales with the current width, and its own draw-in animation is suppressed while a resize is in progress so the line tracks the drag smoothly. The committed width is clamped between `CARD_MIN_WIDTH_PX` and `CARD_MAX_WIDTH_RATIO` of the available space (both defined once in `constants.ts` and shared by the hook and the wrapper), and is persisted in the `resize` Redux slice alongside the lock state.
 
 The reset button next to it restores the app to its defaults in one click — theme, currency, selected time range, and the card's lock/width — by dispatching the shared `appReset` action.
 

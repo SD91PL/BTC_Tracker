@@ -1,5 +1,9 @@
 import { useCallback } from 'react'
-import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import type {
+	CSSProperties,
+	PointerEvent as ReactPointerEvent,
+	ReactNode,
+} from 'react'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { widthChanged } from '../../store/slices/resizeSlice'
 import { useResizableBox } from '../../hooks/useResizableBox'
@@ -20,7 +24,11 @@ const EDGE_DIRECTIONS: ResizeDirection[] = ['e', 'w']
 // Default footprint matches the original card width.
 const DEFAULT_MAX_WIDTH = '24rem'
 
-export function ResizableWrapper({ children, onWidthChange, onResizingChange }: ResizableWrapperProps) {
+export function ResizableWrapper({
+	children,
+	onWidthChange,
+	onResizingChange,
+}: ResizableWrapperProps) {
 	const dispatch = useAppDispatch()
 	const locked = useAppSelector(state => state.resize.locked)
 	// Width lives in Redux so reset can restore it with everything else.
@@ -31,7 +39,12 @@ export function ResizableWrapper({ children, onWidthChange, onResizingChange }: 
 		[dispatch],
 	)
 
-	const { containerRef, handlePointerDown, handlePointerMove, handlePointerUp } = useResizableBox({
+	const {
+		containerRef,
+		handlePointerDown,
+		handlePointerMove,
+		handlePointerUp,
+	} = useResizableBox({
 		locked,
 		width,
 		onCommitWidth: handleCommitWidth,
@@ -69,10 +82,13 @@ export function ResizableWrapper({ children, onWidthChange, onResizingChange }: 
 	)
 }
 
-// Hit-region + cursor per handle edge — tall, centered, easy to grab.
+// Vertical extent + cursor per handle edge — tall, easy to grab.
+// Horizontal hit-width/offset (mouse vs. touch) live in the
+// `.resize-handle` CSS class (see resizable.css) so a `pointer: coarse`
+// media query can widen the tappable strip on touch devices.
 const HANDLE_STYLE: Record<ResizeDirection, CSSProperties> = {
-	e: { right: '-0.375rem', top: '1rem', bottom: '1rem', width: '0.875rem', cursor: 'ew-resize' },
-	w: { left: '-0.375rem', top: '1rem', bottom: '1rem', width: '0.875rem', cursor: 'ew-resize' },
+	e: { top: '1rem', bottom: '1rem', cursor: 'ew-resize' },
+	w: { top: '1rem', bottom: '1rem', cursor: 'ew-resize' },
 }
 
 interface ResizeHandleProps {
@@ -82,13 +98,19 @@ interface ResizeHandleProps {
 	onPointerUp: (e: ReactPointerEvent<HTMLDivElement>) => void
 }
 
-function ResizeHandle({ direction, onPointerDown, onPointerMove, onPointerUp }: ResizeHandleProps) {
+function ResizeHandle({
+	direction,
+	onPointerDown,
+	onPointerMove,
+	onPointerUp,
+}: ResizeHandleProps) {
 	return (
 		<div
 			onPointerDown={onPointerDown}
 			onPointerMove={onPointerMove}
 			onPointerUp={onPointerUp}
-			className='absolute z-10 flex items-center justify-center touch-none select-none'
+			data-direction={direction}
+			className='resize-handle absolute z-10 flex items-center justify-center touch-none select-none'
 			style={HANDLE_STYLE[direction]}>
 			<span
 				className='rounded-full transition-opacity duration-200 opacity-40 hover:opacity-90'
