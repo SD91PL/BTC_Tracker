@@ -9,6 +9,7 @@ https://sd91pl.github.io/BTC_Tracker/
 ## ✨ Features
 
 - Live BTC price with automatic refresh
+- Animated intro splash — the logo draws itself before the app appears; skipped for users with reduced motion enabled
 - Selectable chart time range — 24h, 1w, 1m, 1y, 5y, or max — with price-change indicator matching the selected period
 - Interactive chart rendered with Recharts, with a hover tooltip showing the exact price and date
 - Dual data source with automatic fallback: CoinGecko is primary; blockchain.info covers 5y/max (outside CoinGecko's free-plan range) and steps in if CoinGecko fails. The active source is shown under the chart
@@ -65,14 +66,14 @@ src/
 ├── api/                # External API calls (CoinGecko, blockchain.info, exchange rate)
 ├── app/                # App shell
 │   └── components/     # UI components (header/range picker, chart, price, toggles,
-│                       # resizable card wrapper, reset button, footer)
+│                       # resizable card wrapper, reset button, footer, intro splash)
 ├── hooks/              # Data-fetching and derived-view hooks (TanStack Query, card resize)
 ├── store/              # Redux Toolkit store (client-side UI state)
 │   ├── slices/         # currency + theme + timeRange + resize slices
 │   ├── actions.ts       # Shared `appReset` action, handled by every slice
 │   ├── hooks.ts        # Typed useAppDispatch / useAppSelector
 │   └── index.ts        # Store configuration
-├── styles/             # Global CSS + theme tokens (theme.css)
+├── styles/             # Global CSS + theme tokens (theme.css) + intro splash (intro.css)
 ├── utils/              # Formatting helpers (currency, date/time per range, downsampling)
 ├── constants.ts        # Shared app-wide constants (per-range fetch config, refetch intervals, etc.)
 ├── theme.ts            # CSS variable re-exports for inline styles
@@ -93,6 +94,10 @@ The project is split into two layers:
 The app supports light and dark themes, toggled via the switch beneath the card. Theme state lives in the Redux `theme` slice; `App.tsx` syncs it to a `data-theme` attribute on `<html>`, which drives all colors.
 
 All colors are defined as CSS custom properties in `src/styles/theme.css` (dark is the default/fallback). `src/theme.ts` re-exports the solid tokens as `var(--color-…)` strings for use in inline styles, so they stay reactive to theme changes.
+
+## 🎬 Intro Splash
+
+Before the app UI appears, `IntroSplash.tsx` inlines the logo SVG (`assets/img/logotype.svg`) and animates each letterform's `stroke`/`fill` — outline draws in, then fills solid — followed by a fade-out revealing the app underneath, which has already been mounted and fetching data in the background. The whole sequence is driven by CSS keyframes (`styles/intro.css`); the component itself holds no timers or state, it just unmounts on `animationend`. Skipped entirely when `prefers-reduced-motion: reduce` is set.
 
 ## ↔️ Resizable Layout & Reset
 
