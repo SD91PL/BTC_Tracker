@@ -6,12 +6,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	animation: intro-splash-fade 2.3s ease forwards;
+	animation: intro-splash-fade 2.4s ease forwards;
 }
 
 @keyframes intro-splash-fade {
 	0%,
-	80% {
+	82% {
 		opacity: 1;
 		transform: scale(1);
 		filter: blur(0);
@@ -30,7 +30,11 @@
 	max-width: 70vw;
 	max-height: 70vw;
 	border-radius: 9999px;
-	background: radial-gradient(circle, rgba(var(--color-mint-rgb), 0.25) 0%, transparent 70%);
+	background: radial-gradient(
+		circle,
+		rgba(var(--color-mint-rgb), 0.25) 0%,
+		transparent 70%
+	);
 	filter: blur(20px);
 	animation: intro-glow-pulse 2.2s ease-in-out infinite;
 }
@@ -38,6 +42,22 @@
 .intro-splash__logo {
 	position: relative;
 	width: min(55vw, 15rem);
+	animation: intro-logo-motion 2.4s ease-in-out forwards;
+}
+
+@keyframes intro-logo-motion {
+	0% {
+		opacity: 0;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1);
+	}
 }
 
 .intro-splash__logo svg {
@@ -48,33 +68,26 @@
 }
 
 .intro-splash__logo path {
-	animation: intro-logo-draw 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+	fill: var(--color-mint);
+	stroke: var(--color-mint);
+	stroke-width: 1.5px;
+	animation: intro-logo-stroke 2.4s ease-out forwards;
 }
 
-@keyframes intro-logo-draw {
+@keyframes intro-logo-stroke {
 	0% {
-		fill: transparent;
-		stroke: var(--color-mint);
-		stroke-width: 2px;
+		fill-opacity: 0;
 		stroke-opacity: 0;
-		opacity: 0;
 	}
 	25% {
+		fill-opacity: 0;
 		stroke-opacity: 1;
-		opacity: 1;
 	}
-	65% {
-		fill: transparent;
-		stroke: var(--color-mint);
-		stroke-width: 1px;
-		stroke-opacity: 1;
+	70% {
+		fill-opacity: 1;
 	}
 	100% {
-		fill: var(--color-mint);
-		stroke: var(--color-mint);
-		stroke-width: 0px;
-		stroke-opacity: 0;
-		opacity: 1;
+		fill-opacity: 1;
 	}
 }
 
@@ -94,9 +107,13 @@
 	.intro-splash {
 		animation: none;
 	}
+	.intro-splash__logo {
+		animation: none;
+		opacity: 1;
+	}
 	.intro-splash__logo path {
 		animation: none;
-		fill: var(--color-mint);
+		fill-opacity: 1;
 	}
 	.intro-splash__glow {
 		animation: none;
