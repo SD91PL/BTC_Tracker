@@ -101,6 +101,8 @@ The intro animation displays the logo in two stages: the outline appears first, 
 
 The animation is implemented in CSS (`styles/intro.css`) and supports `prefers-reduced-motion: reduce` for improved accessibility for users who prefer reduced motion.
 
+After the splash fades out, the main layout elements enter with a soft puff-in animation (bottom and center variants). Both the splash and the layout animations respect `prefers-reduced-motion`.
+
 ## ↔️ Resizable Layout & Reset
 
 Beneath the card, the width toggle unlocks free horizontal resizing: drag either edge of the card — with a mouse on desktop or a finger on touch devices — or pinch with two fingers, to stretch or shrink it. Edge dragging is handled via the Pointer Events API, so the same handler drives both mouse and touch; on touch devices the invisible hit-region around each edge widens (via a `pointer: coarse` media query in `resizable.css`) since a fingertip needs a much bigger target than a mouse cursor to land on it reliably. The chart reacts live — its X-axis tick density scales with the current width, and its own draw-in animation is suppressed while a resize is in progress so the line tracks the drag smoothly. The committed width is clamped between `CARD_MIN_WIDTH_PX` and `CARD_MAX_WIDTH_RATIO` of the available space (both defined once in `constants.ts` and shared by the hook and the wrapper), and is persisted in the `resize` Redux slice alongside the lock state.

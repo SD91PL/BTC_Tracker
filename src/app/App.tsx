@@ -55,7 +55,7 @@ export default function App() {
 					onResizingChange={handleCardResizingChange}>
 					{/* Gradient border */}
 					<div
-						className='relative w-full h-full'
+						className='relative w-full h-full puff-in-bottom'
 						style={{
 							borderRadius: '1.25rem',
 							padding: '0.0625rem',
@@ -113,7 +113,7 @@ export default function App() {
 					</div>
 				</ResizableWrapper>
 
-				<div className='flex items-center gap-3'>
+				<div className='flex items-center gap-3 puff-in-center'>
 					<ResizeToggle />
 					<ResetButton />
 					<ThemeToggle />
