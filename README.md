@@ -1,4 +1,4 @@
-# Minimalist BTC Price Tracker
+# BTC_Tracker
 
 A modern React + Vite dashboard for monitoring Bitcoin price movements in real time. The app combines live market data, a polished glassmorphism UI, and smooth theme/currency transitions in a compact single-screen experience.
 
