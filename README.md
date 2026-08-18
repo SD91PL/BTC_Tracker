@@ -97,7 +97,9 @@ All colors are defined as CSS custom properties in `src/styles/theme.css` (dark 
 
 ## 🎬 Intro Splash
 
-Before the app UI appears, `IntroSplash.tsx` inlines the logo SVG (`assets/img/logotype.svg`) and animates each letterform's `stroke`/`fill` — outline draws in, then fills solid — followed by a fade-out revealing the app underneath, which has already been mounted and fetching data in the background. The whole sequence is driven by CSS keyframes (`styles/intro.css`); the component itself holds no timers or state, it just unmounts on `animationend`. Skipped entirely when `prefers-reduced-motion: reduce` is set.
+The intro animation displays the logo in two stages: the outline appears first, followed by the logo fill. The splash screen then transitions smoothly into the main application.
+
+The animation is implemented in CSS (`styles/intro.css`) and supports `prefers-reduced-motion: reduce` for improved accessibility for users who prefer reduced motion.
 
 ## ↔️ Resizable Layout & Reset
 
