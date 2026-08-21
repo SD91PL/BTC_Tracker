@@ -12,6 +12,7 @@ import { ResetButton } from './components/ResetButton'
 import { ResizableWrapper } from './components/ResizableWrapper'
 import { IntroSplash } from './components/IntroSplash'
 import { useAppSelector } from '../store/hooks'
+import MobileFooter from './components/MobileFooter'
 
 export default function App() {
 	// Reduced motion: skip intro entirely.
@@ -118,6 +119,7 @@ export default function App() {
 					<ResetButton />
 					<ThemeToggle />
 				</div>
+				<MobileFooter />
 			</div>
 		</>
 	)
